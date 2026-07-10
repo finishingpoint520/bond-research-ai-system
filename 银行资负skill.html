@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>银行资负分析专家 Skill</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   DESIGN TOKENS
+   ══════════════════════════════════════════════ */
+:root {
+  --bg:        #FAF9F6;
+  --text:      #1C2127;
+  --text-muted:#6B7280;
+  --accent:    #8B1E2A;
+  --accent-dim:#A8555F;
+  --data:      #2D5F7C;
+  --data-light:#E8F0F6;
+  --rule:      #E5E2DC;
+  --card-bg:   #FFFFFF;
+  --tag-agent: #8B1E2A;
+  --tag-quant: #2D5F7C;
+  --tag-cross: #6B5E53;
+  --shadow:    0 1px 3px rgba(28,33,39,0.06), 0 1px 2px rgba(28,33,39,0.04);
+  --shadow-hv: 0 8px 24px rgba(28,33,39,0.10), 0 2px 8px rgba(28,33,39,0.06);
+  --radius:    6px;
+  --radius-lg: 12px;
+}
+
+/* ══════════════════════════════════════════════
+   RESET & BASE
+   ══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+body {
+  font-family:'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  font-weight:400; font-size:15px; line-height:1.75;
+  color:var(--text); background:var(--bg);
+}
+
+h1,h2,h3 { font-family:'Noto Serif SC', 'SimSun', serif; }
+.serif { font-family:'Noto Serif SC', 'SimSun', serif; }
+.mono { font-family:'JetBrains Mono', 'Cascadia Code', monospace; }
+
+/* ══════════════════════════════════════════════
+   LAYOUT PRIMITIVES
+   ══════════════════════════════════════════════ */
+.wrap { max-width:1080px; margin:0 auto; padding:0 40px; }
+section { padding:80px 0; }
+.section-rule { border-top:1px solid var(--rule); }
+
+.sec-eyebrow {
+  font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:500;
+  letter-spacing:0.12em; color:var(--accent); text-transform:uppercase;
+  margin-bottom:16px;
+}
+.sec-title {
+  font-family:'Noto Serif SC', serif; font-size:36px; font-weight:700;
+  line-height:1.3; color:var(--text); margin-bottom:12px; letter-spacing:-0.01em;
+}
+.sec-sub {
+  font-family:'Noto Sans SC', sans-serif; font-size:16px; font-weight:300;
+  color:var(--text-muted); line-height:1.7; max-width:640px; margin-bottom:40px;
+}
+
+/* ══════════════════════════════════════════════
+   HERO
+   ══════════════════════════════════════════════ */
+.hero { padding:100px 0 60px; }
+.hero .wrap { display:flex; align-items:center; gap:60px; }
+.hero-left { flex:1; }
+.hero h1 {
+  font-family:'Noto Serif SC', serif; font-size:42px; font-weight:900;
+  line-height:1.25; letter-spacing:-0.02em; margin-bottom:20px;
+}
+.hero h1 em { font-style:normal; color:var(--accent); }
+.hero-desc {
+  font-size:17px; font-weight:300; color:var(--text-muted); line-height:1.8;
+  max-width:560px; margin-bottom:24px;
+}
+.hero-signature { font-size:13px; color:var(--text-muted); }
+.hero-signature span { color:var(--accent); font-weight:500; }
+
+/* ══════════════════════════════════════════════
+   CARD GRID
+   ══════════════════════════════════════════════ */
+.card-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+.card-grid-2 { display:grid; grid-template-columns:repeat(2, 1fr); gap:20px; }
+@media(max-width:900px){ .card-grid{grid-template-columns:repeat(2,1fr);} .card-grid-2{grid-template-columns:1fr;} }
+@media(max-width:580px){ .card-grid,.card-grid-2{grid-template-columns:1fr;} }
+
+.card {
+  background:var(--card-bg); border-radius:var(--radius-lg);
+  padding:28px; box-shadow:var(--shadow); border:1px solid var(--rule);
+  display:flex; flex-direction:column; gap:12px;
+  transition:box-shadow 0.25s, transform 0.25s;
+}
+.card:hover { box-shadow:var(--shadow-hv); transform:translateY(-2px); }
+.card-tag {
+  display:inline-block; align-self:flex-start;
+  font-family:'Noto Sans SC', sans-serif; font-size:11px; font-weight:500;
+  letter-spacing:0.06em; padding:3px 10px; border-radius:3px;
+  color:#fff;
+}
+.card-tag.agent { background:var(--tag-agent); }
+.card-tag.quant { background:var(--tag-quant); }
+.card-tag.cross { background:var(--tag-cross); }
+.card h4 {
+  font-family:'Noto Serif SC', serif; font-size:18px; font-weight:700;
+  line-height:1.4; color:var(--text);
+}
+.card p {
+  font-size:13.5px; line-height:1.65; color:var(--text-muted); flex:1;
+}
+
+/* ══════════════════════════════════════════════
+   FLOW PANEL (from reference)
+   ══════════════════════════════════════════════ */
+.flow-panel {
+  background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg);
+  padding:32px;
+}
+.flow-panel h4 {
+  font-family:'Noto Serif SC', serif; font-size:20px; font-weight:700; margin-bottom:8px;
+}
+.flow-panel .subtitle { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+
+/* ══════════════════════════════════════════════
+   CHAIN DIAGRAM
+   ══════════════════════════════════════════════ */
+.chain-wrap {
+  background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg);
+  padding:32px 28px; overflow-x:auto;
+}
+.chain-row {
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  justify-content:center; padding:12px 0;
+}
+.chain-node {
+  padding:10px 18px; border-radius:var(--radius); font-size:13px;
+  font-weight:500; white-space:nowrap;
+}
+.chain-node.src { background:var(--data-light); color:var(--data); font-family:'Noto Serif SC',serif; font-weight:700; }
+.chain-node.mid { background:rgba(139,30,42,0.06); color:var(--text); }
+.chain-node.dst { background:rgba(139,30,42,0.10); color:var(--accent); font-weight:700; font-family:'JetBrains Mono',monospace; }
+.chain-arrow {
+  color:var(--text-muted); font-size:18px; font-weight:300;
+}
+
+/* ══════════════════════════════════════════════
+   TRANSMISSION CHAIN (tree)
+   ══════════════════════════════════════════════ */
+.xmit-wrap {
+  background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg);
+  padding:28px; overflow-x:auto;
+}
+.xmit-root {
+  display:inline-block; padding:10px 22px; border-radius:var(--radius);
+  background:var(--data); color:#fff; font-family:'Noto Serif SC',serif;
+  font-size:14px; font-weight:700; margin-bottom:20px;
+}
+.xmit-tree { display:flex; flex-direction:column; gap:10px; padding-left:0; }
+.xmit-branch {
+  display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap;
+}
+.xmit-cause {
+  padding:8px 16px; border-radius:4px; background:var(--data-light);
+  font-size:13px; color:var(--data); font-weight:500; white-space:nowrap;
+  min-width:180px; text-align:center;
+}
+.xmit-arrow-text {
+  color:var(--accent); font-family:'JetBrains Mono',monospace; font-size:13px;
+  font-weight:600; padding:8px 0;
+}
+.xmit-effect {
+  padding:8px 16px; border-radius:4px; background:rgba(139,30,42,0.06);
+  font-size:13px; color:var(--accent); font-family:'JetBrains Mono',monospace;
+  font-weight:600; white-space:nowrap;
+}
+
+/* ══════════════════════════════════════════════
+   STEP CARDS
+   ══════════════════════════════════════════════ */
+.step-card {
+  background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg);
+  padding:28px; box-shadow:var(--shadow); position:relative;
+  border-left:4px solid var(--data); margin-bottom:16px;
+}
+.step-card h4 {
+  font-family:'Noto Serif SC', serif; font-size:18px; font-weight:700;
+  margin-bottom:8px; color:var(--text);
+}
+.step-card .step-num {
+  font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--data);
+  font-weight:500; margin-bottom:4px;
+}
+.step-card .step-sub {
+  font-size:13px; color:var(--accent); font-weight:500; margin-bottom:12px;
+}
+.step-card p { font-size:14px; line-height:1.7; color:var(--text-muted); }
+
+/* ══════════════════════════════════════════════
+   TABLE (from reference)
+   ══════════════════════════════════════════════ */
+.table-wrap {
+  overflow-x:auto; background:var(--card-bg); border-radius:var(--radius-lg);
+  border:1px solid var(--rule); box-shadow:var(--shadow);
+}
+table {
+  width:100%; border-collapse:collapse; font-size:13px;
+}
+thead th {
+  font-family:'Noto Sans SC', sans-serif; font-size:12px; font-weight:600;
+  color:var(--text); text-align:center; padding:14px 12px;
+  background:var(--bg); border-bottom:2px solid var(--rule);
+  white-space:nowrap;
+}
+thead th:first-child { text-align:left; padding-left:20px; }
+tbody td {
+  padding:10px 12px; text-align:center; border-bottom:1px solid var(--rule);
+  font-size:13px;
+}
+tbody td:first-child {
+  text-align:left; padding-left:20px;
+  font-family:'Noto Sans SC', sans-serif; color:var(--text);
+}
+
+/* ══════════════════════════════════════════════
+   SCENARIO CARDS
+   ══════════════════════════════════════════════ */
+.scenario-card {
+  background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg);
+  padding:28px; box-shadow:var(--shadow);
+}
+.scenario-card .sc-label {
+  font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
+  color:var(--accent); margin-bottom:8px;
+}
+.scenario-card h4 {
+  font-family:'Noto Serif SC', serif; font-size:17px; font-weight:700;
+  margin-bottom:14px; color:var(--text);
+}
+.scenario-card dl { font-size:13px; line-height:1.8; }
+.scenario-card dt {
+  font-weight:600; color:var(--text); margin-top:10px;
+}
+.scenario-card dd {
+  color:var(--text-muted); margin-left:0; margin-bottom:6px;
+}
+.scenario-card .highlight-path {
+  font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--accent);
+  background:rgba(139,30,42,0.06); padding:4px 10px; border-radius:4px;
+  display:inline-block; margin-top:4px;
+}
+
+/* ══════════════════════════════════════════════
+   OUTPUT LIST
+   ══════════════════════════════════════════════ */
+.output-list {
+  background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg);
+  padding:28px 32px; box-shadow:var(--shadow);
+}
+.output-list ol { padding-left:20px; }
+.output-list li {
+  font-size:14px; line-height:1.8; color:var(--text); padding:6px 0;
+}
+.output-list li strong { color:var(--data); }
+
+/* ══════════════════════════════════════════════
+   CODE BLOCK STYLE
+   ══════════════════════════════════════════════ */
+.code-block {
+  font-family:'JetBrains Mono',monospace; font-size:13px; line-height:1.8;
+  background:var(--bg); color:var(--text); padding:16px 20px;
+  border-radius:var(--radius); border:1px solid var(--rule);
+  overflow-x:auto; white-space:pre;
+}
+
+/* ══════════════════════════════════════════════
+   FOOTER
+   ══════════════════════════════════════════════ */
+footer { padding:40px 0; text-align:center; font-size:13px; color:var(--text-muted); border-top:1px solid var(--rule); }
+footer span { color:var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-left">
+      <h1>银行资负分析专家<br><em>Skill</em> — 资金面/流动性视角</h1>
+      <p class="hero-desc">
+        从银行资产负债状态出发，研判债市资金面（狭义流动性）走势。核心方法论：站在<strong>银行司库（Treasury）视角</strong>，代入"流动性安全 → 利率风险管理 → 利润考核"三层目标，微观主体决策推演。
+      </p>
+      <p class="hero-signature"><span>研究中心（固收）</span> &nbsp;|&nbsp; 五因子Agent系统 &nbsp;|&nbsp; 银行资负Skill</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 1: 概览
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">01 / 概览</div>
+    <h2 class="sec-title">Skill 要解决什么</h2>
+    <p class="sec-sub">
+      核心聚焦银行资产负债状态变化对债市资金面/流动性的传导，每一步分析直指 DR001 方向与 R001-DR001 利差变化。
+    </p>
+
+    <div class="chain-wrap">
+      <div class="chain-row">
+        <span class="chain-node src">银行资负</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node mid">大行融出</span>
+        <span class="chain-arrow">+</span>
+        <span class="chain-node mid">CD市场</span>
+        <span class="chain-arrow">+</span>
+        <span class="chain-node mid">结构性摩擦</span>
+        <span class="chain-arrow">+</span>
+        <span class="chain-node mid">监管脉冲</span>
+        <span class="chain-arrow">→</span>
+        <span class="chain-node dst">DR001</span>
+        <span class="chain-arrow">+</span>
+        <span class="chain-node dst">R-DR利差</span>
+      </div>
+    </div>
+
+    <div class="card-grid" style="margin-top:28px;">
+      <div class="card">
+        <span class="card-tag quant">分析领域</span>
+        <h4>资金面/流动性研判</h4>
+        <p>DR001/R001/R-DR利差方向判断、大行融出行为、存单量价信号、银行资负结构性变化、季末监管脉冲等。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag agent">核心方法</span>
+        <h4>银行司库视角推演</h4>
+        <p>站在银行 Treasury 视角，代入流动性安全→利率风险管理→利润考核三层目标，每一轮资金面变化都追溯到司库具体行为选择。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag cross">分析落点</span>
+        <h4>DR001 + R-DR利差</h4>
+        <p>所有分析最终归因到 DR001 中枢方向和 R001-DR001 利差变化，直接服务于杠杆策略、CD配置、套息交易等债市决策。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 2: 触发条件
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">02 / 触发条件</div>
+    <h2 class="sec-title">何时激活此 Skill</h2>
+
+    <div class="card-grid" style="margin-top:28px;">
+      <div class="card">
+        <span class="card-tag quant">资金面方向</span>
+        <h4>DR001/R001 方向判断</h4>
+        <p>银行间资金面/流动性分析，判断DR001、R001中枢方向及R-DR利差变化趋势。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag quant">大行融出</span>
+        <h4>大行融出行为变化</h4>
+        <p>大行融出规模变化及对隔夜资金面的含义，判断融出收缩/扩张对DR001的影响。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag quant">存单信号</span>
+        <h4>同业存单量价信号</h4>
+        <p>CD发行量价变化对资金面的含义，判断存单是否有效突破MLF利率的信号意义。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag agent">结构性变化</span>
+        <h4>银行资负结构性变化</h4>
+        <p>存款搬家、存贷增速差、超储分布等结构性变化对资金面的传导影响。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag agent">季末冲击</span>
+        <h4>季末/税期冲击研判</h4>
+        <p>季末MPA+LCR考核、税期等特定时点对资金面的脉冲式冲击分析。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag cross">央行态度</span>
+        <h4>央行货币政策态度</h4>
+        <p>央行日常OMO操作、MLF/买断式回购、降准等基础货币投放的态度研判。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 3: 核心传导链
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">03 / 核心传导链</div>
+    <h2 class="sec-title">从银行资负到资金面价格的五条传导路径</h2>
+
+    <div class="xmit-wrap">
+      <div class="xmit-root">银行资负状态</div>
+      <div class="xmit-tree">
+        <div class="xmit-branch">
+          <span class="xmit-cause">大行存贷增速差</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-cause">大行融出规模</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-effect">DR001 中枢</span>
+        </div>
+        <div class="xmit-branch">
+          <span class="xmit-cause">存款搬家 / CD到期</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-cause">CD 量价信号</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-effect">资金面压力</span>
+        </div>
+        <div class="xmit-branch">
+          <span class="xmit-cause">大行/中小行超储分布</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-cause">结构性摩擦</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-effect">R-DR 利差</span>
+        </div>
+        <div class="xmit-branch">
+          <span class="xmit-cause">LCR / NSFR 考核时点</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-cause">季末融出收缩</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-effect">R利率脉冲（R-DR走阔）</span>
+        </div>
+        <div class="xmit-branch">
+          <span class="xmit-cause">央行态度指数</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-cause">基础货币总量</span>
+          <span class="xmit-arrow-text">→</span>
+          <span class="xmit-effect">超储率水位</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 4: 六步法分析框架
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">04 / 分析框架</div>
+    <h2 class="sec-title">六步法：每步落点 DR001 / R-DR利差</h2>
+
+    <!-- Step 1 -->
+    <div class="step-card">
+      <div class="step-num">第一步</div>
+      <h4>大行融出研判 — 隔夜资金的"水源"</h4>
+      <div class="step-sub">决定 DR001 的最核心因子</div>
+      <p>核心问题：大行有多少可融出资金？愿不愿意往外借？大行存贷增速差 → 融出规模 → DR001 中枢方向，是大行资负状态最直接的映射。</p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card">
+      <div class="step-num">第二步</div>
+      <h4>CD市场信号 — 负债压力的高频窗口</h4>
+      <div class="step-sub">CD量价变化领先 DR001 方向</div>
+      <p>CD是观测银行负债压力的最佳高频指标。CD提价发行 → 银行负债压力上升 → 大行融出意愿下降 → DR001中枢上移。CD是否有效突破MLF（1.50%）是关键信号。</p>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card">
+      <div class="step-num">第三步</div>
+      <h4>结构性摩擦研判 — 超储在谁手里？</h4>
+      <div class="step-sub">总量超储充裕 ≠ DR001低</div>
+      <p>核心认知：关键是超储分布在能融出的机构手中。R-DR利差的核心驱动：大行负债压力↑ → 减少隔夜融出 → R001-DR001走阔（分层加剧）；季末MPA+LCR → 大行融出收缩 → R001-DR001脉冲式走阔（三重驱动：MPA考核+同融占比上限33%+货基赎回负反馈）；非银资金充裕 → 配置CD → 间接压低短端 → R001-DR001收窄。</p>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card">
+      <div class="step-num">第四步</div>
+      <h4>央行态度研判 — 水龙头开多大？</h4>
+      <div class="step-sub">DR001是检验央行态度变化的最即时窗口</div>
+
+      <div class="table-wrap" style="margin-top:16px;">
+        <table>
+          <thead>
+            <tr>
+              <th>央行操作组合</th>
+              <th>态度信号</th>
+              <th>对 DR001 的含义</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>持续净投放（OMO+MLF+买断式）</td>
+              <td>呵护</td>
+              <td style="color:var(--data);font-weight:600;">DR001中枢下移</td>
+            </tr>
+            <tr>
+              <td>归零操作（逆回购量为0）</td>
+              <td>认为资金过松，回归中性</td>
+              <td style="color:var(--accent);">短期→DR001触底后缓慢回升</td>
+            </tr>
+            <tr>
+              <td>缩量续做+净回笼</td>
+              <td>偏紧</td>
+              <td style="color:var(--accent);font-weight:600;">DR001中枢上移</td>
+            </tr>
+            <tr>
+              <td>重启国债买入</td>
+              <td>补充长期流动性</td>
+              <td style="color:var(--data);font-weight:600;">超储长效改善→DR001中枢下移</td>
+            </tr>
+            <tr>
+              <td>降准</td>
+              <td>强烈宽松</td>
+              <td style="color:var(--data);font-weight:700;">DR001中枢显著下移</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px;font-size:13px;color:var(--text-muted);">DR001最直接反映央行每日OMO操作的态度——当OMO净投放时大行隔夜融出最敏感，DR001比DR007更快反应。</p>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="step-card">
+      <div class="step-num">第五步</div>
+      <h4>资金面"自发性宽松/收紧"的条件判断</h4>
+      <div class="card-grid-2" style="margin-top:16px;">
+        <div class="card" style="border-color:var(--data);">
+          <span class="card-tag quant">自发性宽松</span>
+          <h4>需同时满足4个信号</h4>
+          <p>参考2022年、2026H1情形：大行融出规模持续高位 + CD量价双稳（未突破MLF） + 超储分布均衡（大行占比高） + 央行态度呵护（持续净投放）</p>
+        </div>
+        <div class="card" style="border-color:var(--accent);">
+          <span class="card-tag agent">自发性收紧</span>
+          <h4>需警惕4个信号</h4>
+          <p>大行融出规模骤降 + CD提价放量（接近或突破MLF） + 超储向中小行转移（结构性摩擦加大） + 央行态度边际转紧（净回笼/归零操作）</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="step-card">
+      <div class="step-num">第六步</div>
+      <h4>综合研判 → DR001 + R-DR利差</h4>
+      <div class="step-sub">整合前五步信息，形成完整判断</div>
+
+      <div class="card-grid" style="margin-top:12px;">
+        <div class="card">
+          <span class="card-tag quant">DR001中枢</span>
+          <h4>低于 / 贴近 / 高于<br>政策利率 1.40%</h4>
+          <p>判断当前DR001中枢相对OMO利率的位置及短期方向。</p>
+        </div>
+        <div class="card">
+          <span class="card-tag agent">R-DR利差</span>
+          <h4>低位 / 正常 / 走阔<br>/ 明显分层</h4>
+          <p>判断R001-DR001分层状态及方向，反映非银资金面的结构性紧张程度。</p>
+        </div>
+        <div class="card">
+          <span class="card-tag cross">策略含义</span>
+          <h4>杠杆 / CD / 套息<br>策略建议</h4>
+          <p>基于DR001与R-DR利差判断，输出杠杆策略友好度、CD配置性价比、套息交易环境评估。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 5: 分情景分析
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">05 / 分情景分析</div>
+    <h2 class="sec-title">三种典型情景速查</h2>
+
+    <div class="card-grid" style="margin-top:28px;">
+      <!-- Scenario A -->
+      <div class="scenario-card">
+        <div class="sc-label">情景 A</div>
+        <h4>司库流动性"极度宽松" → 回归中性</h4>
+        <dl>
+          <dt>特征</dt>
+          <dd>DR001 &lt; 1.25%，MDS/MLF/CMLF全部倒挂</dd>
+          <dt>司库行为</dt>
+          <dd>缩表（减少净融出 + 退出MDS/MLF）</dd>
+          <dt>DR001路径</dt>
+          <dd><span class="highlight-path">1.20% → 1.36% → 1.40%</span>（缓慢回升）</dd>
+          <dt>关键信号</dt>
+          <dd>央行开始"纠偏"（OMO归零 / 金融时报喊话）</dd>
+        </dl>
+      </div>
+
+      <!-- Scenario B -->
+      <div class="scenario-card">
+        <div class="sc-label">情景 B</div>
+        <h4>司库面临"临时性冲击"</h4>
+        <dl>
+          <dt>特征</dt>
+          <dd>大行净融出单日骤降近万亿</dd>
+          <dt>触发</dt>
+          <dd>MDS中标不足 或 信贷窗口指导</dd>
+          <dt>司库行为</dt>
+          <dd>应激性缩表 → 后续重新摆布头寸 → 渐进回归</dd>
+          <dt>DR001路径</dt>
+          <dd><span class="highlight-path">骤升 → 次日起渐进回落</span></dd>
+          <dt>关键信号</dt>
+          <dd>是否为"申报量 &gt; 中标量"</dd>
+        </dl>
+      </div>
+
+      <!-- Scenario C -->
+      <div class="scenario-card">
+        <div class="sc-label">情景 C</div>
+        <h4>司库资负缺口承压（结构性）</h4>
+        <dl>
+          <dt>特征</dt>
+          <dd>存款外生流失 + CD集中到期 + 回购利率上行</dd>
+          <dt>司库行为</dt>
+          <dd>提价发CD → 提价吸同业活期 → 划定"司库预算线"控成本</dd>
+          <dt>DR001路径</dt>
+          <dd><span class="highlight-path">中枢上移至 1.40—1.45%</span></dd>
+          <dt>关键信号</dt>
+          <dd>CD是否有效突破MLF（1.50%）</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 6: 输出格式
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">06 / Skill 输出格式</div>
+    <h2 class="sec-title">标准输出结构</h2>
+    <p class="sec-sub">
+      资金面分析按以下8步结构输出，每一步都归因到 DR001 / R-DR利差。
+    </p>
+
+    <div class="output-list">
+      <ol>
+        <li><strong>总体判断</strong> — DR001中枢 + 方向 + 一句话定性；R001-DR001分层状态</li>
+        <li><strong>大行融出研判 → DR001方向</strong> — 存贷增速差、融出规模、冗余存款变化</li>
+        <li><strong>CD市场信号 → DR001压力</strong> — 量价组合、大行发行占比</li>
+        <li><strong>结构性摩擦 → R001-DR001利差</strong> — 超储分布、揽储分化、货币传导摩擦</li>
+        <li><strong>央行态度 → DR001政策环境</strong> — 态度指数、操作组合</li>
+        <li><strong>监管脉冲时点</strong> — 距季末/税期距离，预期对DR001和R001-DR001的短期冲击</li>
+        <li><strong>综合结论</strong> + 对杠杆/套息策略的含义</li>
+        <li><strong>风险提示</strong></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════ -->
+<footer>
+  <div class="wrap">
+    <span>研究中心（固收）</span> &nbsp;|&nbsp; 五因子Agent系统 &nbsp;|&nbsp; 银行资负分析专家 Skill
+  </div>
+</footer>
+
+</body>
+</html>

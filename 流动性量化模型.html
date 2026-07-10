@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>流动性量化模型</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Serif+SC:wght@400;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   DESIGN TOKENS
+   ══════════════════════════════════════════════ */
+:root {
+  --bg:        #FAF9F6;
+  --text:      #1C2127;
+  --text-muted:#6B7280;
+  --accent:    #8B1E2A;
+  --accent-dim:#A8555F;
+  --data:      #2D5F7C;
+  --data-light:#E8F0F6;
+  --rule:      #E5E2DC;
+  --card-bg:   #FFFFFF;
+  --tag-quant: #2D5F7C;
+  --tag-agent: #8B1E2A;
+  --tag-cross: #6B5E53;
+  --shadow:    0 1px 3px rgba(28,33,39,0.06), 0 1px 2px rgba(28,33,39,0.04);
+  --shadow-hv: 0 8px 24px rgba(28,33,39,0.10), 0 2px 8px rgba(28,33,39,0.06);
+  --radius:    6px;
+  --radius-lg: 12px;
+  --green:     #2E7D32;
+  --green-bg:  #E8F5E9;
+}
+
+/* ══════════════════════════════════════════════
+   RESET & BASE
+   ══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+body {
+  font-family:'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  font-weight:400; font-size:15px; line-height:1.75;
+  color:var(--text); background:var(--bg);
+}
+
+h1,h2,h3 { font-family:'Noto Serif SC', 'SimSun', serif; }
+.serif { font-family:'Noto Serif SC', 'SimSun', serif; }
+.mono { font-family:'JetBrains Mono', 'Cascadia Code', monospace; }
+
+/* ══════════════════════════════════════════════
+   LAYOUT PRIMITIVES
+   ══════════════════════════════════════════════ */
+.wrap { max-width:1080px; margin:0 auto; padding:0 40px; }
+section { padding:80px 0; }
+.section-rule { border-top:1px solid var(--rule); }
+
+.sec-eyebrow {
+  font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:500;
+  letter-spacing:0.12em; color:var(--accent); text-transform:uppercase;
+  margin-bottom:16px;
+}
+.sec-title {
+  font-family:'Noto Serif SC', serif; font-size:36px; font-weight:700;
+  line-height:1.3; color:var(--text); margin-bottom:12px; letter-spacing:-0.01em;
+}
+.sec-sub {
+  font-family:'Noto Sans SC', sans-serif; font-size:16px; font-weight:300;
+  color:var(--text-muted); line-height:1.7; max-width:640px; margin-bottom:40px;
+}
+
+/* ══════════════════════════════════════════════
+   HERO
+   ══════════════════════════════════════════════ */
+.hero { padding:100px 0 60px; }
+.hero .wrap { display:flex; align-items:center; gap:60px; }
+.hero-left { flex:1; }
+.hero h1 {
+  font-family:'Noto Serif SC', serif; font-size:42px; font-weight:900;
+  line-height:1.25; letter-spacing:-0.02em; margin-bottom:20px;
+}
+.hero h1 em {
+  font-style:normal; color:var(--accent);
+}
+.hero-desc {
+  font-size:17px; font-weight:300; color:var(--text-muted); line-height:1.8;
+  max-width:540px; margin-bottom:24px;
+}
+.hero-signature { font-size:13px; color:var(--text-muted); }
+.hero-signature span { color:var(--accent); font-weight:500; }
+
+/* ══════════════════════════════════════════════
+   CARD GRID
+   ══════════════════════════════════════════════ */
+.card-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+.card-grid-2 { display:grid; grid-template-columns:repeat(2, 1fr); gap:20px; }
+@media(max-width:900px){ .card-grid{grid-template-columns:repeat(2,1fr);} .card-grid-2{grid-template-columns:1fr;} }
+@media(max-width:580px){ .card-grid,.card-grid-2{grid-template-columns:1fr;} }
+
+.card {
+  background:var(--card-bg); border-radius:var(--radius-lg);
+  padding:28px; box-shadow:var(--shadow); border:1px solid var(--rule);
+  display:flex; flex-direction:column; gap:12px;
+  transition:box-shadow 0.25s, transform 0.25s;
+}
+.card:hover { box-shadow:var(--shadow-hv); transform:translateY(-2px); }
+.card-tag {
+  display:inline-block; align-self:flex-start;
+  font-family:'Noto Sans SC', sans-serif; font-size:11px; font-weight:500;
+  letter-spacing:0.06em; padding:3px 10px; border-radius:3px;
+  color:#fff;
+}
+.card-tag.quant { background:var(--tag-quant); }
+.card-tag.agent { background:var(--tag-agent); }
+.card h4 {
+  font-family:'Noto Serif SC', serif; font-size:18px; font-weight:700;
+  line-height:1.4; color:var(--text);
+}
+.card p {
+  font-size:13.5px; line-height:1.65; color:var(--text-muted);
+  flex:1;
+}
+
+/* ══════════════════════════════════════════════
+   SIGNAL LEGEND
+   ══════════════════════════════════════════════ */
+.signal-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:'JetBrains Mono', monospace; font-size:13px; font-weight:600;
+  padding:4px 12px; border-radius:4px;
+}
+.signal-badge.up { background:var(--accent); color:#fff; }
+.signal-badge.down { background:var(--green); color:#fff; }
+
+/* ══════════════════════════════════════════════
+   STAT ROW
+   ══════════════════════════════════════════════ */
+.stat-row { display:flex; gap:32px; flex-wrap:wrap; }
+.stat-item { flex:1; min-width:150px; }
+.stat-num {
+  font-family:'JetBrains Mono', monospace; font-size:48px; font-weight:600;
+  color:var(--data); line-height:1.1; margin-bottom:6px;
+}
+.stat-num.accent { color:var(--accent); }
+.stat-label { font-size:13px; color:var(--text-muted); line-height:1.5; }
+
+/* ══════════════════════════════════════════════
+   TABLE
+   ══════════════════════════════════════════════ */
+.table-wrap {
+  overflow-x:auto; background:var(--card-bg); border-radius:var(--radius-lg);
+  border:1px solid var(--rule); box-shadow:var(--shadow);
+}
+table {
+  width:100%; border-collapse:collapse; font-size:13px;
+}
+thead th {
+  font-family:'Noto Sans SC', sans-serif; font-size:12px; font-weight:600;
+  color:var(--text); text-align:center; padding:14px 10px;
+  background:var(--bg); border-bottom:2px solid var(--rule);
+  white-space:nowrap;
+}
+thead th:first-child { text-align:left; padding-left:20px; }
+tbody td {
+  padding:10px; text-align:center; border-bottom:1px solid var(--rule);
+  font-family:'JetBrains Mono', monospace; font-size:13px;
+}
+tbody td:first-child {
+  text-align:left; padding-left:20px;
+  font-family:'Noto Sans SC', sans-serif; font-size:13px; color:var(--text);
+}
+.cell-up { color:var(--accent); font-weight:600; background:rgba(139,30,42,0.06); }
+.cell-down { color:var(--green); font-weight:600; background:var(--green-bg); }
+.cell-na { color:var(--text-muted); }
+
+/* indicator table */
+.ind-table tbody td { font-family:'Noto Sans SC', sans-serif; font-size:12.5px; color:var(--text-muted); }
+.ind-table tbody td:nth-child(1) { font-family:'JetBrains Mono', monospace; color:var(--text-muted); text-align:center; }
+.ind-table tbody td:nth-child(2),
+.ind-table tbody td:nth-child(3) { color:var(--text); font-weight:500; }
+.ind-table tbody td:nth-child(5) { font-family:'JetBrains Mono', monospace; }
+.ind-table .acc-cell { font-family:'JetBrains Mono', monospace; font-weight:600; }
+
+/* ══════════════════════════════════════════════
+   FOOTER
+   ══════════════════════════════════════════════ */
+footer { padding:40px 0; text-align:center; font-size:13px; color:var(--text-muted); border-top:1px solid var(--rule); }
+footer span { color:var(--accent); }
+
+/* ══════════════════════════════════════════════
+   BLOCK LIST
+   ══════════════════════════════════════════════ */
+.block-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+@media(max-width:900px){ .block-grid{grid-template-columns:repeat(2,1fr);} }
+@media(max-width:580px){ .block-grid{grid-template-columns:1fr;} }
+
+.block-card {
+  background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg);
+  padding:24px; box-shadow:var(--shadow);
+  border-left:4px solid var(--data);
+}
+.block-card h4 {
+  font-family:'Noto Serif SC', serif; font-size:16px; font-weight:700;
+  margin-bottom:10px; color:var(--text);
+}
+.block-card ul {
+  list-style:none; font-size:13px; color:var(--text-muted); line-height:1.7;
+}
+.block-card ul li::before { content:'· '; color:var(--data); font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-left">
+      <h1>流动性量化模型<br>债券市场资金面<em>系统性研判</em></h1>
+      <p class="hero-desc">
+        以量化方法对下周债券市场<strong>资金价格中枢</strong>进行多空预测。通过6大分析板块、7个核心指标投票，生成周度资金面方向信号，辅助短期限资产定价决策。
+      </p>
+      <p class="hero-signature"><span>研究中心（固收）</span> &nbsp;|&nbsp; 量化模型系统</p>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 1: 模型总览
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">01 / 模型总览</div>
+    <h2 class="sec-title">总览：目标、方法与业务意义</h2>
+    <p class="sec-sub">
+      模型以周为频率运行，每周末输出下周资金利率方向信号，直接服务于债券短期限资产定价。
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-tag quant">模型目标</span>
+        <h4>预测资金价格中枢方向</h4>
+        <p>对下周债券市场资金价格中枢进行多空预测，判断中枢下行（看多）或上行（看空），为短端利率研判提供量化参考。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag quant">模型频率</span>
+        <h4>周频运行</h4>
+        <p>每周运行一次，每周末可给出下周资金价格多空信号。信号涵盖投票法主信号和日历效应辅助信号。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag agent">业务意义</span>
+        <h4>直接影响短端定价</h4>
+        <p>资金价格上行/下行直接影响债券短期限资产定价，模型为短端久期和杠杆策略提供前瞻性信号参考。</p>
+      </div>
+    </div>
+
+    <div class="stat-row" style="margin-top:36px;">
+      <div class="stat-item">
+        <div class="stat-num accent">75.4<span style="font-size:24px;">%</span></div>
+        <div class="stat-label">投票法综合<br>历史准确率</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">71<span style="font-size:24px;">%</span></div>
+        <div class="stat-label">2026年以来<br>实时准确率</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">6</div>
+        <div class="stat-label">大分析板块<br>覆盖流动性全景</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">7</div>
+        <div class="stat-label">核心投票指标<br>29个候选指标中精选</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">周频</div>
+        <div class="stat-label">信号更新频率<br>每周末产出方向信号</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 2: 信号机制
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">02 / 信号产生机制</div>
+    <h2 class="sec-title">投票法 + 日历效应法</h2>
+    <p class="sec-sub">
+      7个核心指标各产生方向信号（1或-1），投票取多数方为最终信号；日历效应仅在特殊周补充信号。
+    </p>
+
+    <div class="card-grid-2" style="margin-bottom:24px;">
+      <div class="card">
+        <span class="card-tag quant">主信号</span>
+        <h4>投票法</h4>
+        <p>7个核心指标各自独立产生方向信号（1表示资金利率中枢上行，-1表示下行），以多数投票结果作为本周最终多空信号。每个指标的信号构建均基于趋势类（动量/反转）方法，经样本内筛选和样本外验证。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag agent">辅助信号</span>
+        <h4>日历效应法</h4>
+        <p>针对税期（大月/小月）、月末/季末、长假（春节/五一/十一）、北交所新股申购等特殊时点，仅在特殊周生成信号，作为投票法信号的补充参考。</p>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:16px; align-items:center; padding:20px 24px; background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg); flex-wrap:wrap;">
+      <span style="font-size:13px; color:var(--text-muted);">信号规则：</span>
+      <span class="signal-badge up">1 → 资金利率中枢上行（看空）</span>
+      <span class="signal-badge down">-1 → 资金利率中枢下行（看多）</span>
+      <span style="font-size:13px; color:var(--text-muted); margin-left:8px;">| 绿色背景 = 判断正确</span>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 3: 六大分析板块
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">03 / 指标体系</div>
+    <h2 class="sec-title">六大分析板块，29→7核心指标</h2>
+    <p class="sec-sub">
+      从流动性跟踪数据库中初筛29个可能产生影响的关键指标，经统计效果、业务逻辑和因子相关性三重筛选，最终入选7个核心投票指标。
+    </p>
+
+    <div class="block-grid">
+      <div class="block-card">
+        <h4>央行投放</h4>
+        <ul>
+          <li>短期：7天/14天逆回购</li>
+          <li>中期：MLF/买断式逆回购</li>
+          <li>长期：国债买卖、降准</li>
+          <li>存量余额：短期逆回购余额</li>
+        </ul>
+      </div>
+      <div class="block-card">
+        <h4>银行资负端</h4>
+        <ul>
+          <li>政府债供给：发行量/净融资</li>
+          <li>负债端：同业存单发行量/价格</li>
+          <li>信贷投放：票据利率</li>
+          <li>资金压力预期：Shibor利率</li>
+        </ul>
+      </div>
+      <div class="block-card">
+        <h4>资金价格预期</h4>
+        <ul>
+          <li>市场预期：利率互换FR007:1Y与FR007的利差</li>
+          <li>反映市场对未来资金价格的定价</li>
+        </ul>
+      </div>
+      <div class="block-card">
+        <h4>资金面供给端</h4>
+        <ul>
+          <li>大行净融出规模</li>
+          <li>银行体系净融出规模</li>
+          <li>大行+货基净融出规模</li>
+        </ul>
+      </div>
+      <div class="block-card">
+        <h4>资金面需求端</h4>
+        <ul>
+          <li>银行间市场杠杆率</li>
+          <li>银行间质押式回购成交量</li>
+          <li>R001成交量占比</li>
+        </ul>
+      </div>
+      <div class="block-card">
+        <h4>日历效应 &amp; 资金中枢</h4>
+        <ul>
+          <li>税期（大月/小月）</li>
+          <li>月末/季末</li>
+          <li>长假（春节/五一/十一）</li>
+          <li>北交所新股申购</li>
+          <li style="margin-top:4px; color:var(--accent); font-weight:500;">Y: DR007-7天OMO（周均值）</li>
+        </ul>
+      </div>
+    </div>
+
+    <p style="margin-top:28px;font-size:13px;color:var(--text-muted);">
+      核心入选指标（标黄7个）：短期逆回购余额、政府债发行量、同业存单发行量、(利率互换FR007:1Y)-FR007、R001成交量占比、银行间质押式回购成交量、DR007-7天OMO
+    </p>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 4: 指标构建方式
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">04 / 构建方法</div>
+    <h2 class="sec-title">指标构建方式与回测框架</h2>
+    <p class="sec-sub">
+      趋势类（动量/反转）方法是构建信号最有效的方式；波动率法和分位数法经尝试未采用。
+    </p>
+
+    <div class="card-grid">
+      <div class="card">
+        <span class="card-tag quant">信号构建</span>
+        <h4>趋势类方法</h4>
+        <p>每个指标使用短周期均线上穿/下穿长周期均线的方式判断趋势方向，确定信号为1（看空）或-1（看多）。7个指标的具体均线参数各不相同，经样本内最优化筛选。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag quant">数据处理</span>
+        <h4>日度→周度转换</h4>
+        <p>日度数据先生成日度信号，再由日度信号转化为周维度（统计一周内1和-1的个数，多数投票）。周度数据直接生成周度信号，无需转化。</p>
+      </div>
+      <div class="card">
+        <span class="card-tag quant">回测框架</span>
+        <h4>样本内/外验证</h4>
+        <p>回测时间：2021年1月—2025年12月。样本内（2021—2024）用于参数筛选，样本外（2025年至今）用于模型验证，确保因子不会失效。</p>
+      </div>
+    </div>
+
+    <div style="margin-top:32px; display:flex; gap:0; align-items:stretch; background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg); overflow:hidden;">
+      <div style="flex:1; padding:24px; text-align:center; background:var(--data-light);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:32px; font-weight:600; color:var(--data);">2021—2024</div>
+        <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">样本内训练期</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">筛选最优指标与参数组合</div>
+      </div>
+      <div style="width:2px; background:var(--rule);"></div>
+      <div style="flex:1; padding:24px; text-align:center; background:rgba(139,30,42,0.04);">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:32px; font-weight:600; color:var(--accent);">2025至今</div>
+        <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">样本外验证期</div>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:8px;">观察因子表现，确保不会失效</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 5: 模型效果
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">05 / 模型效果</div>
+    <h2 class="sec-title">7个核心指标与投票法表现</h2>
+    <p class="sec-sub">
+      每个指标均采用趋势类方法构建，参数各不相同。投票法综合准确率75.4%，2021—2025各年均表现稳健。
+    </p>
+
+    <div class="table-wrap">
+      <table class="ind-table">
+        <thead>
+          <tr>
+            <th>序号</th>
+            <th>指标板块</th>
+            <th>指标名称</th>
+            <th>构建逻辑</th>
+            <th>综合准确率</th>
+            <th>2021</th>
+            <th>2022</th>
+            <th>2023</th>
+            <th>2024</th>
+            <th>2025</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td><td>央行投放</td><td>短期逆回购余额</td>
+            <td style="font-size:12px;">1日均线上穿21日均线 → 资金利率下行（-1），反之上行（1）</td>
+            <td class="acc-cell" style="color:var(--data);">65.9%</td>
+            <td>55.8</td><td>65.4</td><td>69.8</td><td>65.4</td><td>71.2</td>
+          </tr>
+          <tr>
+            <td>2</td><td>银行资负端</td><td>政府债发行量</td>
+            <td style="font-size:12px;">3周均线上穿6周均线 → 资金利率上行（1），反之下行（-1）</td>
+            <td class="acc-cell" style="color:var(--data);">66.3%</td>
+            <td>59.6</td><td>61.5</td><td>77.4</td><td>65.4</td><td>67.3</td>
+          </tr>
+          <tr>
+            <td>3</td><td>银行资负端</td><td>同业存单发行量</td>
+            <td style="font-size:12px;">当周值上穿3周均线 → 资金利率上行（1），反之下行（-1）</td>
+            <td class="acc-cell" style="color:var(--data);">63.6%</td>
+            <td>63.5</td><td>57.7</td><td>60.4</td><td>63.5</td><td>75.0</td>
+          </tr>
+          <tr>
+            <td>4</td><td>资金价格预期</td><td>(FR007:1Y)-FR007</td>
+            <td style="font-size:12px;">3日均线上穿63日均线 → 资金利率上行（1），反之下行（-1）</td>
+            <td class="acc-cell" style="color:var(--data);">68.2%</td>
+            <td>71.2</td><td>61.5</td><td>69.8</td><td>67.3</td><td>73.1</td>
+          </tr>
+          <tr>
+            <td>5</td><td>资金面需求端</td><td>R001成交量占比</td>
+            <td style="font-size:12px;">5日均线上穿21日均线 → 资金利率上行（1），反之下行（-1）</td>
+            <td class="acc-cell" style="color:var(--data);">70.5%</td>
+            <td>63.5</td><td>69.2</td><td>75.5</td><td>71.2</td><td>71.2</td>
+          </tr>
+          <tr>
+            <td>6</td><td>资金面需求端</td><td>银行间质押式回购成交量</td>
+            <td style="font-size:12px;">1日均线上穿21日均线 → 资金利率上行（1），反之下行（-1）</td>
+            <td class="acc-cell" style="color:var(--data);">65.5%</td>
+            <td>63.5</td><td>63.5</td><td>71.7</td><td>69.2</td><td>57.7</td>
+          </tr>
+          <tr>
+            <td>7</td><td>Y自身</td><td>DR007-7天OMO</td>
+            <td style="font-size:12px;">3日均线上穿21日均线 → 资金利率下行（-1），反之上行（1）</td>
+            <td class="acc-cell" style="color:var(--data);">69.3%</td>
+            <td>67.3</td><td>59.6</td><td>71.7</td><td>75.0</td><td>71.2</td>
+          </tr>
+          <tr style="background:var(--data-light);">
+            <td style="font-weight:700; color:var(--data);">-</td>
+            <td style="font-weight:700; color:var(--data);" colspan="2">投票法综合（7指标多数投票）</td>
+            <td style="font-size:12px; color:var(--text-muted);">7个指标信号取多数 → 最终信号</td>
+            <td class="acc-cell" style="font-weight:700; color:var(--accent);">75.4%</td>
+            <td style="font-weight:600;">71.2</td>
+            <td style="font-weight:600;">67.3</td>
+            <td style="font-weight:600;">79.2</td>
+            <td style="font-weight:600;">76.9</td>
+            <td style="font-weight:700; color:var(--accent);">80.8</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 6: 2026年信号表现
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">06 / 今年以来表现</div>
+    <h2 class="sec-title">2026年周度信号追踪</h2>
+    <p class="sec-sub">
+      今年以来实时准确率71%，以下为各周投票法信号与分项指标信号的完整记录。
+    </p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>预测目标周</th>
+            <th>投票法信号</th>
+            <th>短期逆回购余额</th>
+            <th>政府债发行量</th>
+            <th>同业存单发行量</th>
+            <th>(FR007:1Y)<br>-FR007</th>
+            <th>回购成交量</th>
+            <th>R001占比</th>
+            <th>DR007<br>-7D OMO</th>
+            <th>日历效应</th>
+            <th>实际变动</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>0629—0703</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✓</td>
+          </tr>
+          <tr>
+            <td>0622—0626</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td>
+            <td class="cell-up" style="font-weight:700;">1 ✗</td>
+          </tr>
+          <tr>
+            <td>0615—0618</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td>
+            <td class="cell-up" style="font-weight:700;">1 ✗</td>
+          </tr>
+          <tr>
+            <td>0608—0612</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-na">无</td>
+            <td class="cell-up" style="font-weight:700;">1 ✓</td>
+          </tr>
+          <tr>
+            <td>0601—0605</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✓</td>
+          </tr>
+          <tr>
+            <td>0525—0529</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td>
+            <td class="cell-up" style="font-weight:700;">1 ✓</td>
+          </tr>
+          <tr>
+            <td>0518—0522</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td>
+            <td class="cell-up" style="font-weight:700;">1 ✓</td>
+          </tr>
+          <tr>
+            <td>0511—0515</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-na">无</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✓</td>
+          </tr>
+          <tr>
+            <td>0506—0509</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✓</td>
+          </tr>
+          <tr>
+            <td>0427—0430</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td>
+            <td class="cell-up" style="font-weight:700;">1 ✓</td>
+          </tr>
+          <tr>
+            <td>0420—0424</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✗</td>
+          </tr>
+          <tr>
+            <td>0413—0417</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-na">无</td>
+            <td class="cell-up" style="font-weight:700;">1 ✓</td>
+          </tr>
+          <tr>
+            <td>0407—0410</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✓</td>
+          </tr>
+          <tr>
+            <td>0330—0403</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✗</td>
+          </tr>
+          <tr>
+            <td>0323—0327</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✗</td>
+          </tr>
+          <tr>
+            <td>0316—0320</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✗</td>
+          </tr>
+          <tr>
+            <td>0309—0313</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-na">无</td>
+            <td class="cell-up" style="font-weight:700;">1 ✓</td>
+          </tr>
+          <tr>
+            <td>0302—0306</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✗</td>
+          </tr>
+          <tr>
+            <td>0224—0228</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✓</td>
+          </tr>
+          <tr>
+            <td>0209—0214</td>
+            <td class="cell-up">1</td>
+            <td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td>
+            <td class="cell-up" style="font-weight:700;">1 ✓</td>
+          </tr>
+          <tr>
+            <td>0202—0206</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✓</td>
+          </tr>
+          <tr>
+            <td>0126—0130</td>
+            <td class="cell-up">1</td>
+            <td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-up">1</td>
+            <td class="cell-up" style="font-weight:700;">1 ✓</td>
+          </tr>
+          <tr>
+            <td>0119—0123</td>
+            <td class="cell-down">-1</td>
+            <td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td>
+            <td class="cell-down" style="font-weight:700;">-1 ✓</td>
+          </tr>
+          <tr>
+            <td>0112—0116</td>
+            <td class="cell-up">1</td>
+            <td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-up">1</td><td class="cell-down">-1</td><td class="cell-up">1</td><td class="cell-na">无</td>
+            <td class="cell-up" style="font-weight:700;">1 ✓</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════ -->
+<footer>
+  <div class="wrap">
+    <span>研究中心（固收）</span> &nbsp;|&nbsp; 量化模型系统 &nbsp;|&nbsp; 流动性量化模型
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<!-- saved from url=(0105)file:///E:/AI-skills-%E8%B6%85%E7%BA%A7%E6%83%B3%E6%B3%95/%E6%B1%87%E6%8A%A5%E9%A1%B5%E9%9D%A2/index.html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>债市投研AI系统 — 研究中心（固收）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./债市投研AI系统 — 研究中心（固收）_files/css2" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   DESIGN TOKENS
+   ══════════════════════════════════════════════ */
+:root {
+  --bg:        #FAF9F6;
+  --text:      #1C2127;
+  --text-muted:#6B7280;
+  --accent:    #8B1E2A;
+  --accent-dim:#A8555F;
+  --data:      #2D5F7C;
+  --data-light:#E8F0F6;
+  --rule:      #E5E2DC;
+  --card-bg:   #FFFFFF;
+  --tag-agent: #8B1E2A;
+  --tag-quant: #2D5F7C;
+  --tag-cross: #6B5E53;
+  --shadow:    0 1px 3px rgba(28,33,39,0.06), 0 1px 2px rgba(28,33,39,0.04);
+  --shadow-hv: 0 8px 24px rgba(28,33,39,0.10), 0 2px 8px rgba(28,33,39,0.06);
+  --radius:    6px;
+  --radius-lg: 12px;
+}
+
+/* ══════════════════════════════════════════════
+   RESET & BASE
+   ══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; -webkit-font-smoothing:antialiased; }
+body {
+  font-family:'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  font-weight:400; font-size:15px; line-height:1.75;
+  color:var(--text); background:var(--bg);
+}
+
+/* typography */
+h1,h2,h3 { font-family:'Noto Serif SC', 'SimSun', serif; }
+.serif { font-family:'Noto Serif SC', 'SimSun', serif; }
+.mono { font-family:'JetBrains Mono', 'Cascadia Code', monospace; }
+a { color:var(--accent); text-decoration:none; transition:color 0.2s; }
+a:hover { color:var(--accent-dim); }
+
+/* ══════════════════════════════════════════════
+   LAYOUT PRIMITIVES
+   ══════════════════════════════════════════════ */
+.wrap { max-width:1080px; margin:0 auto; padding:0 40px; }
+section { padding:80px 0; }
+.section-rule { border-top:1px solid var(--rule); }
+
+/* section header */
+.sec-eyebrow {
+  font-family:'JetBrains Mono', monospace; font-size:11px; font-weight:500;
+  letter-spacing:0.12em; color:var(--accent); text-transform:uppercase;
+  margin-bottom:16px;
+}
+.sec-title {
+  font-family:'Noto Serif SC', serif; font-size:36px; font-weight:700;
+  line-height:1.3; color:var(--text); margin-bottom:12px; letter-spacing:-0.01em;
+}
+.sec-sub {
+  font-family:'Noto Sans SC', sans-serif; font-size:16px; font-weight:300;
+  color:var(--text-muted); line-height:1.7; max-width:640px; margin-bottom:40px;
+}
+
+/* card grid */
+.card-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:20px; }
+@media(max-width:900px){ .card-grid{grid-template-columns:repeat(2,1fr);} }
+@media(max-width:580px){ .card-grid{grid-template-columns:1fr;} }
+
+.card {
+  background:var(--card-bg); border-radius:var(--radius-lg);
+  padding:28px; box-shadow:var(--shadow); border:1px solid var(--rule);
+  display:flex; flex-direction:column; gap:12px;
+  transition:box-shadow 0.25s, transform 0.25s;
+}
+.card:hover { box-shadow:var(--shadow-hv); transform:translateY(-2px); }
+.card-tag {
+  display:inline-block; align-self:flex-start;
+  font-family:'Noto Sans SC', sans-serif; font-size:11px; font-weight:500;
+  letter-spacing:0.06em; padding:3px 10px; border-radius:3px;
+  color:#fff;
+}
+.card-tag.agent { background:var(--tag-agent); }
+.card-tag.quant { background:var(--tag-quant); }
+.card-tag.cross { background:var(--tag-cross); }
+.card h4 {
+  font-family:'Noto Serif SC', serif; font-size:18px; font-weight:700;
+  line-height:1.4; color:var(--text);
+}
+.card p {
+  font-size:13.5px; line-height:1.65; color:var(--text-muted);
+  flex:1;
+}
+.card-link {
+  font-size:13px; font-weight:500; display:inline-flex; align-items:center;
+  gap:4px; transition:gap 0.2s;
+}
+.card-link:hover { gap:8px; }
+.card-link.disabled { color:var(--text-muted); cursor:not-allowed; opacity:0.5; }
+.card-link.disabled:hover { gap:4px; color:var(--text-muted); }
+
+/* ══════════════════════════════════════════════
+   HERO
+   ══════════════════════════════════════════════ */
+.hero { padding:100px 0 60px; }
+.hero .wrap { display:flex; align-items:center; gap:60px; }
+.hero-left { flex:1; }
+.hero-right { flex:0 0 280px; display:flex; align-items:center; justify-content:center; }
+.hero h1 {
+  font-family:'Noto Serif SC', serif; font-size:42px; font-weight:900;
+  line-height:1.25; letter-spacing:-0.02em; margin-bottom:20px;
+}
+.hero h1 em {
+  font-style:normal; color:var(--accent);
+}
+.hero-desc {
+  font-size:17px; font-weight:300; color:var(--text-muted); line-height:1.8;
+  max-width:540px; margin-bottom:24px;
+}
+.hero-signature { font-size:13px; color:var(--text-muted); }
+.hero-signature span { color:var(--accent); font-weight:500; }
+
+/* radar chart */
+#radar-svg { width:260px; height:260px; }
+.radar-label { font-family:'Noto Sans SC', sans-serif; font-size:12px; fill:var(--text); }
+.radar-label-muted { font-size:10px; fill:var(--text-muted); }
+
+/* ══════════════════════════════════════════════
+   TWO-WORKFLOW COMPARISON
+   ══════════════════════════════════════════════ */
+.dual-panel { display:grid; grid-template-columns:1fr auto 1fr; gap:0; align-items:stretch; }
+@media(max-width:800px){ .dual-panel{grid-template-columns:1fr;} .flow-arrow{display:none;} }
+.flow-panel {
+  background:var(--card-bg); border:1px solid var(--rule); border-radius:var(--radius-lg);
+  padding:32px;
+}
+.flow-panel h4 {
+  font-family:'Noto Serif SC', serif; font-size:20px; font-weight:700; margin-bottom:8px;
+}
+.flow-panel .subtitle { font-size:13px; color:var(--text-muted); margin-bottom:20px; }
+.flow-panel ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+.flow-panel li { font-size:14px; line-height:1.6; padding-left:18px; position:relative; }
+.flow-panel li::before { content:''; position:absolute; left:0; top:9px; width:6px; height:6px; border-radius:50%; }
+.flow-panel.agent-panel li::before { background:var(--tag-agent); }
+.flow-panel.quant-panel li::before { background:var(--tag-quant); }
+.flow-panel .output-line {
+  margin-top:16px; padding-top:16px; border-top:1px solid var(--rule);
+  font-size:13px; color:var(--text-muted);
+}
+.flow-panel .output-line strong { color:var(--text); }
+.flow-arrow {
+  display:flex; align-items:center; justify-content:center;
+  padding:0 24px;
+}
+.flow-arrow-inner {
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  font-size:12px; color:var(--text-muted); text-align:center;
+}
+.flow-arrow-inner .arrow-svg { width:40px; height:60px; }
+
+/* ══════════════════════════════════════════════
+   STAT ROW
+   ══════════════════════════════════════════════ */
+.stat-row { display:flex; gap:32px; flex-wrap:wrap; }
+.stat-item { flex:1; min-width:150px; }
+.stat-num {
+  font-family:'JetBrains Mono', monospace; font-size:48px; font-weight:600;
+  color:var(--data); line-height:1.1; margin-bottom:6px;
+}
+.stat-label { font-size:13px; color:var(--text-muted); line-height:1.5; }
+
+/* ══════════════════════════════════════════════
+   ARCHITECTURE DIAGRAM
+   ══════════════════════════════════════════════ */
+.arch-stack { display:flex; flex-direction:column; gap:0; }
+.arch-row {
+  display:flex; gap:16px; padding:24px 28px; align-items:center;
+}
+.arch-row.top {
+  background:var(--card-bg); border:1px solid var(--rule);
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+}
+.arch-row.mid {
+  background:var(--card-bg); border:1px solid var(--rule); border-top:none;
+  display:grid; grid-template-columns:1fr 1fr; gap:16px;
+}
+.arch-row.btm {
+  background:var(--card-bg); border:1px solid var(--rule); border-top:none;
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+}
+.arch-col {
+  padding:20px; border-radius:var(--radius); border:1px solid var(--rule);
+  background:var(--bg);
+}
+.arch-col h5 { font-family:'Noto Serif SC', serif; font-size:15px; margin-bottom:6px; }
+.arch-col .tag { font-size:11px; padding:2px 8px; border-radius:3px; display:inline-block; margin-bottom:8px; }
+.arch-col ul { list-style:none; font-size:13px; color:var(--text-muted); display:flex; flex-direction:column; gap:4px; }
+.arch-label {
+  font-family:'Noto Serif SC', serif; font-size:15px; font-weight:700;
+  padding-right:20px; white-space:nowrap;
+}
+.arch-row.btm .arch-content { font-size:13px; color:var(--text-muted); line-height:1.6; }
+
+/* ══════════════════════════════════════════════
+   TIMELINE
+   ══════════════════════════════════════════════ */
+.timeline { display:flex; gap:0; position:relative; padding:20px 0; }
+.timeline::before {
+  content:''; position:absolute; top:50%; left:0; right:0; height:2px;
+  background:var(--rule);
+}
+.timeline-item { flex:1; position:relative; padding:0 12px; }
+.timeline-dot {
+  width:14px; height:14px; border-radius:50%; background:var(--accent);
+  border:3px solid var(--bg); position:relative; z-index:1; margin:0 auto 16px;
+  box-shadow:0 0 0 3px var(--rule);
+}
+.timeline-date {
+  font-family:'JetBrains Mono', monospace; font-size:12px; font-weight:500;
+  color:var(--accent); margin-bottom:6px; text-align:center;
+}
+.timeline-text { font-size:13px; color:var(--text); line-height:1.5; text-align:center; }
+.timeline-text strong { display:block; margin-bottom:2px; }
+
+/* ══════════════════════════════════════════════
+   FOOTER
+   ══════════════════════════════════════════════ */
+footer { padding:40px 0; text-align:center; font-size:13px; color:var(--text-muted); border-top:1px solid var(--rule); }
+footer span { color:var(--accent); }
+
+/* ══════════════════════════════════════════════
+   ADD-CARD HINT
+   ══════════════════════════════════════════════ */
+.card-placeholder {
+  border:2px dashed var(--rule); background:transparent; box-shadow:none;
+  display:flex; align-items:center; justify-content:center; min-height:180px;
+}
+.card-placeholder:hover { box-shadow:none; transform:none; }
+.card-placeholder p { text-align:center; color:var(--text-muted); font-size:13px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+     ═══════════════════════════════════════════ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-left">
+      <h1>AI重建固收投研操作系统<br>研究中心（固收）</h1>
+      <p class="hero-desc">
+        研究中心（固收）过去一年并行推进两条工作流——<strong>五因子多Agent策略审计系统</strong>（定性框架的Agent化）和<strong>AI量化模型系统</strong>（定量信号的体系化）——目标不是"用AI写周报"，而是重新定义债券投研的底层工作方式。
+      </p>
+      <p class="hero-signature"><span>研究中心（固收）</span> &nbsp;|&nbsp; 2026年7月</p>
+    </div>
+    <div class="hero-right">
+      <svg id="radar-svg" viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+        <!-- pentagon background -->
+        <polygon points="130,28 227,98 190,210 70,210 33,98" fill="none" stroke="var(--rule)" stroke-width="1"></polygon>
+        <!-- inner pentagon 2 -->
+        <polygon points="130,68 200,110 173,178 87,178 60,110" fill="rgba(139,30,42,0.06)" stroke="var(--accent)" stroke-width="1" stroke-dasharray="4 3"></polygon>
+        <!-- inner pentagon 1 (equal weight) -->
+        <polygon points="130,95 182,127 161,155 99,155 78,127" fill="rgba(45,95,124,0.12)" stroke="var(--data)" stroke-width="2"></polygon>
+        <!-- center dot -->
+        <circle cx="130" cy="130" r="3" fill="var(--accent)"></circle>
+        <!-- lines from center -->
+        <line x1="130" y1="130" x2="130" y2="28" stroke="var(--rule)" stroke-width="0.5"></line>
+        <line x1="130" y1="130" x2="227" y2="98" stroke="var(--rule)" stroke-width="0.5"></line>
+        <line x1="130" y1="130" x2="190" y2="210" stroke="var(--rule)" stroke-width="0.5"></line>
+        <line x1="130" y1="130" x2="70" y2="210" stroke="var(--rule)" stroke-width="0.5"></line>
+        <line x1="130" y1="130" x2="33" y2="98" stroke="var(--rule)" stroke-width="0.5"></line>
+        <!-- labels -->
+        <text x="130" y="18" text-anchor="middle" class="radar-label" font-weight="500">基本面</text>
+        <text x="240" y="100" text-anchor="start" class="radar-label">政策面</text>
+        <text x="198" y="226" text-anchor="middle" class="radar-label">流动性</text>
+        <text x="62" y="226" text-anchor="middle" class="radar-label">市场情绪</text>
+        <text x="20" y="100" text-anchor="end" class="radar-label">机构行为</text>
+        <!-- legend -->
+        <rect x="172" y="235" width="10" height="10" rx="2" fill="rgba(45,95,124,0.3)"></rect>
+        <text x="186" y="244" class="radar-label-muted">等权信号</text>
+        <rect x="172" y="250" width="10" height="10" rx="2" fill="none" stroke="var(--accent)" stroke-width="1" stroke-dasharray="4 3"></rect>
+        <text x="186" y="259" class="radar-label-muted">动态权重</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 1: TWO WORKFLOWS
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">01 / 系统全景</div>
+    <h2 class="sec-title">两条工作流，一个目标</h2>
+    <p class="sec-sub">
+      就像飞机的两个引擎：量化模型是传感器——告诉你当前的速度/高度/姿态；Agent审计系统是驾驶舱——把所有信息整合成可执行的决策。
+    </p>
+
+    <div class="dual-panel">
+      <!-- left: agent system -->
+      <div class="flow-panel agent-panel">
+        <h4>债市五因子多Agent策略审计系统</h4>
+        <p class="subtitle">定性框架的 Agent 化 &nbsp;·&nbsp; 12个Agent协作</p>
+        <ul>
+          <li><strong>5个因子Agent</strong> 分别对基本面/政策面/流动性/市场情绪/机构行为进行四维打分</li>
+          <li><strong>Regime Agent</strong> 识别市场状态（宽松扩散/收紧传导/博弈震荡/拥挤反转/风险逃离）</li>
+          <li><strong>Narrative Agent</strong> 提取当前主导叙事 Top 3</li>
+          <li><strong>Crowding Agent</strong> 评估交易拥挤度，影响赔率和仓位</li>
+          <li><strong>Pricing-Odds Agent</strong> 区分估值赔率和交易赔率</li>
+          <li><strong>Case Retrieval Agent</strong> 检索历史相似案例，提供胜率参考</li>
+          <li><strong>策略生成 + Verifier审计</strong> 合成策略 → 反证审计 → 可执行建议</li>
+        </ul>
+        <div class="output-line">
+          输出：<strong>结构化策略审计报告</strong>（评分表 / 冲突表 / 情景树 / 证伪点 / 审计意见）
+        </div>
+      </div>
+
+      <!-- arrow -->
+      <div class="flow-arrow">
+        <div class="flow-arrow-inner">
+          <svg class="arrow-svg" viewBox="0 0 40 60" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 0 L20 40 M12 32 L20 44 L28 32" stroke="var(--text-muted)" stroke-width="1.5" fill="none"></path>
+            <path d="M20 44 L20 52 M12 44 L20 56 L28 44" stroke="var(--text-muted)" stroke-width="1.5" fill="none" opacity="0.4"></path>
+          </svg>
+          <span>量化信号输入<br>人工复核<br>策略决策</span>
+        </div>
+      </div>
+
+      <!-- right: quant system -->
+      <div class="flow-panel quant-panel">
+        <h4>债市AI量化模型系统</h4>
+        <p class="subtitle">定量信号的体系化 &nbsp;·&nbsp; 三大模型矩阵</p>
+        <ul>
+          <li><strong>宏观高频景气指数 (v2)</strong> 追踪经济增长、通胀、融资需求等维度的综合景气判断</li>
+          <li><strong>流动性量化模型 (迭代中)</strong> 建模DR007/存单等资金利率的中枢与边际变化，日度信号+强度值</li>
+          <li><strong>机构情绪择时指数 (已上线)</strong> 从机构行为和市场情绪指标中提取对10Y有择时意义的因子，每日邮件推送</li>
+          <li><strong>机构情绪同步指数 (拟合中)</strong> 衡量当前市场整体交易热度（过冷/中性/过热），与10Y高度同步，辅助仓位管理</li>
+          <li><strong>跨资产验证体系</strong> 整合债券/股票/商品/汇率周度信号，形成跨市场验证闭环</li>
+        </ul>
+        <div class="output-line">
+          输出：<strong>量化信号序列 + 可视化图表</strong>（方向 / 强度 / 分位数 / 回测）
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 2: DELIVERABLES (CONFIGURABLE CARDS)
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">02 / 已完成交付物</div>
+    <h2 class="sec-title">已完成交付物</h2>
+    <p class="sec-sub">
+      以下交付物均有本地 HTML 格式的实际运行报告。<br>
+      点击卡片即可在新标签页中打开查看完整内容。
+    </p>
+
+    <div class="card-grid" id="deliverable-cards">
+      <!-- Filled by JavaScript -->
+    <div class="card"><span class="card-tag agent">五因子Agent系统</span><h4>五因子多Agent
+策略审计系统</h4><p>多Agent协作的债市策略审计框架，覆盖五因子评分→冲突识别→策略生成→反证审计的完整闭环。12个Agent各司其职，输出结构化策略审计报告。</p><a class="card-link disabled" href="file:///E:/AI-skills-%E8%B6%85%E7%BA%A7%E6%83%B3%E6%B3%95/%E6%B1%87%E6%8A%A5%E9%A1%B5%E9%9D%A2/index.html#" target="_self" title="报告整理中，敬请期待">查看报告 →</a></div><div class="card"><span class="card-tag agent">五因子Agent系统</span><h4>政策-舆情-预期差
+Skill (v3)</h4><p>跟踪央行表态、政治局会议、国常会等政策信号，量化政策预期差及其市场影响。已完成2年历史回测验证，迭代至第3版。</p><a class="card-link disabled" href="file:///E:/AI-skills-%E8%B6%85%E7%BA%A7%E6%83%B3%E6%B3%95/%E6%B1%87%E6%8A%A5%E9%A1%B5%E9%9D%A2/index.html#" target="_self" title="报告整理中，敬请期待">查看报告 →</a></div><div class="card"><span class="card-tag quant">量化模型系统</span><h4>宏观高频景气指数</h4><p>追踪经济增长、通胀、融资需求等维度的综合景气判断。已完成第二轮指标迭代，提供宏观方向的量化参考信号。</p><a class="card-link disabled" href="file:///E:/AI-skills-%E8%B6%85%E7%BA%A7%E6%83%B3%E6%B3%95/%E6%B1%87%E6%8A%A5%E9%A1%B5%E9%9D%A2/index.html#" target="_self" title="报告整理中，敬请期待">查看报告 →</a></div><div class="card"><span class="card-tag quant">量化模型系统</span><h4>流动性量化模型</h4><p>建模DR007、存单利率等资金利率的中枢与边际变化。正在升级为日度信号+信号强度值，并计划与存单模型关联。</p><a class="card-link disabled" href="file:///E:/AI-skills-%E8%B6%85%E7%BA%A7%E6%83%B3%E6%B3%95/%E6%B1%87%E6%8A%A5%E9%A1%B5%E9%9D%A2/index.html#" target="_self" title="报告整理中，敬请期待">查看报告 →</a></div><div class="card"><span class="card-tag quant">量化模型系统</span><h4>机构情绪择时指数</h4><p>从机构行为和市场情绪中提取对10Y国债有择时意义的因子。已上线，每日邮件自动推送最新信号。</p><a class="card-link disabled" href="file:///E:/AI-skills-%E8%B6%85%E7%BA%A7%E6%83%B3%E6%B3%95/%E6%B1%87%E6%8A%A5%E9%A1%B5%E9%9D%A2/index.html#" target="_self" title="报告整理中，敬请期待">查看报告 →</a></div><div class="card"><span class="card-tag quant">量化模型系统</span><h4>机构情绪同步指数</h4><p>衡量市场整体交易热度（过冷/中性/过热），与10Y国债高度同步。辅助判断市场是否对利空更敏感、需要仓位管理。</p><a class="card-link disabled" href="file:///E:/AI-skills-%E8%B6%85%E7%BA%A7%E6%83%B3%E6%B3%95/%E6%B1%87%E6%8A%A5%E9%A1%B5%E9%9D%A2/index.html#" target="_self" title="报告整理中，敬请期待">查看报告 →</a></div><div class="card"><span class="card-tag cross">跨资产条线</span><h4>跨资产周度复盘 Skill</h4><p>整合债券、股票、商品、汇率的周度信号，形成跨市场验证闭环。初步版本已形成，持续完善中。</p><a class="card-link disabled" href="file:///E:/AI-skills-%E8%B6%85%E7%BA%A7%E6%83%B3%E6%B3%95/%E6%B1%87%E6%8A%A5%E9%A1%B5%E9%9D%A2/index.html#" target="_self" title="报告整理中，敬请期待">查看报告 →</a></div></div>
+
+    <p style="margin-top:28px;font-size:12px;color:var(--text-muted);">
+      💡 要添加新报告？打开本文件的 <code>&lt;script&gt;</code> 标签，在 <code>DELIVERABLES</code> 数组里加一行对象即可。
+    </p>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 3: PARADIGM SHIFT
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">03 / 范式之变</div>
+    <h2 class="sec-title">从"人写报告"到"人审系统"</h2>
+    <p class="sec-sub">
+      研究员的价值从"写出判断"升级为"审核系统生成的判断，并挑战它"——这是质的飞跃，不是量的提升。
+    </p>
+
+    <div class="dual-panel" style="grid-template-columns:1fr 1fr;">
+      <div class="flow-panel" style="opacity:0.75;">
+        <h4 style="font-size:18px;">传统投研流程</h4>
+        <p class="subtitle">以人为中心的线性生产</p>
+        <ul style="gap:14px;">
+          <li style="padding-left:0;">📥 研究员收集数据 <span style="color:var(--text-muted);font-size:13px;">（约 2h）</span></li>
+          <li style="padding-left:0;">🔍 研究员分析判断 <span style="color:var(--text-muted);font-size:13px;">（约 3h）</span></li>
+          <li style="padding-left:0;">✍️ 研究员撰写报告 <span style="color:var(--text-muted);font-size:13px;">（约 2h）</span></li>
+          <li style="padding-left:0;">👁️ 研究员交叉验证 <span style="color:var(--text-muted);font-size:13px;">（约 1h）</span></li>
+        </ul>
+        <div class="output-line" style="opacity:0.7;">
+          ⏱ 约 8 小时 / 人 &nbsp;·&nbsp; 📊 覆盖 3 个维度 &nbsp;·&nbsp; ⚠️ 无系统反证机制
+        </div>
+      </div>
+
+      <div class="flow-panel agent-panel" style="border-color:var(--accent);">
+        <h4 style="font-size:18px;color:var(--accent);">AI 增强后的流程</h4>
+        <p class="subtitle">以系统为中心，人负责审核与挑战</p>
+        <ul style="gap:14px;">
+          <li style="padding-left:0;">🤖 Agent 自动取数 + 四维打分 <span style="color:var(--text-muted);font-size:13px;">（自动）</span></li>
+          <li style="padding-left:0;">🤖 12个Agent并行分析 + 交叉验证 <span style="color:var(--text-muted);font-size:13px;">（自动）</span></li>
+          <li style="padding-left:0;">👤 研究员审核 + 修正 <span style="color:var(--accent);font-size:13px;font-weight:500;">（约 30min，核心价值）</span></li>
+          <li style="padding-left:0;">🤖 自动反证审计 + 可执行性检查 <span style="color:var(--text-muted);font-size:13px;">（自动）</span></li>
+        </ul>
+        <div class="output-line" style="border-top-color:var(--accent);">
+          ⏱ 45分钟 AI + 30分钟人 &nbsp;·&nbsp; 📊 覆盖 5因子 × 4维评分 &nbsp;·&nbsp; ✅ 内置证伪 + 冲突审计
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 4: DATA SPEAKS
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">04 / 数据说话</div>
+    <h2 class="sec-title">不是画饼，是已经积累的成果</h2>
+    <p class="sec-sub">
+      以下数字代表过去一年的实际产出。每一项都有可查看、可运行的具体交付物对应。
+    </p>
+
+    <div class="stat-row">
+      <div class="stat-item">
+        <div class="stat-num">8<span style="font-size:28px;">+</span></div>
+        <div class="stat-label">已沉淀为可复用<br>AI Skill 的分析模块</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">50<span style="font-size:28px;">–</span>80</div>
+        <div class="stat-label">P0 核心指标<br>覆盖五因子维度</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2<span style="font-size:28px;"> 年</span></div>
+        <div class="stat-label">政策-舆情-预期差 Skill<br>完成历史回测验证</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">v3</div>
+        <div class="stat-label">政策 Skill 迭代版本<br>持续优化打分精度</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">每日</div>
+        <div class="stat-label">机构情绪择时指数<br>已上线邮件自动推送</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 5: ARCHITECTURE
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">05 / 技术架构</div>
+    <h2 class="sec-title">三层一底座，两线共支撑</h2>
+    <p class="sec-sub">
+      三条研究线不是三个独立项目，而是同一套架构上的应用。<br>底层统一、中层共享、上层各司其职。
+    </p>
+
+    <div class="arch-stack">
+      <!-- top: decision layer -->
+      <div class="arch-row top">
+        <div class="arch-label">人工复核<br>+ 策略决策</div>
+        <div class="arch-content" style="flex:1;font-size:14px;color:var(--text);">
+          投资经理基于系统输出做出最终决策：方向 / 久期 / 曲线 / 杠杆 / 品种 / 仓位 / 止损
+        </div>
+      </div>
+
+      <!-- mid: two workflows -->
+      <div class="arch-row mid">
+        <div class="arch-col">
+          <span class="tag" style="background:var(--tag-agent);color:#fff;">五因子Agent系统</span>
+          <h5>定性框架的 Agent 化</h5>
+          <ul>
+            <li>Orchestrator → 任务分派</li>
+            <li>5个因子Agent → 四维打分</li>
+            <li>Regime / Narrative / Crowding / Pricing / Case Retrieval</li>
+            <li>策略生成 + Verifier 审计</li>
+          </ul>
+        </div>
+        <div class="arch-col">
+          <span class="tag" style="background:var(--tag-quant);color:#fff;">量化模型系统</span>
+          <h5>定量信号的体系化</h5>
+          <ul>
+            <li>宏观高频景气指数 → 方向信号</li>
+            <li>流动性量化模型 → 日度信号+强度</li>
+            <li>机构情绪择时指数 → 每日邮件推送</li>
+            <li>机构情绪同步指数 → 交易热度</li>
+            <li>跨资产验证体系 → 信号确认</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- bottom: data layer -->
+      <div class="arch-row btm">
+        <div class="arch-label">共享数据底座</div>
+        <div class="arch-content" style="flex:1;">
+          指标字典 (P0 50-80个) &nbsp;·&nbsp; 估值模型 &nbsp;·&nbsp; 历史案例池 (570+交易日) &nbsp;·&nbsp; 观点原子库 &nbsp;·&nbsp; 政策语义词典 &nbsp;·&nbsp; 事件数据库
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-rule"></div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 6: ROADMAP
+     ═══════════════════════════════════════════ -->
+<section>
+  <div class="wrap">
+    <div class="sec-eyebrow">06 / 下一步</div>
+    <h2 class="sec-title">接下来 6 个月</h2>
+    <p class="sec-sub">
+      不是做一个 Demo 然后搁置，而是建设一个持续运行、每周产出、每月迭代的生产系统。
+    </p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2026.07</div>
+        <div class="timeline-text">
+          <strong>五因子系统首次</strong>
+          端到端全流程运行<br>
+          产出首份完整审计报告
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:var(--data);box-shadow:0 0 0 3px var(--data-light);"></div>
+        <div class="timeline-date" style="color:var(--data);">2026.09</div>
+        <div class="timeline-text">
+          <strong>综合信号融合</strong>
+          三模型信号联合生成<br>
+          月度复盘机制 + 阈值首次校准
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot" style="background:#C4A35A;box-shadow:0 0 0 3px rgba(196,163,90,0.15);"></div>
+        <div class="timeline-date" style="color:#C4A35A;">2026.12</div>
+        <div class="timeline-text">
+          <strong>策略信号投入实战</strong>
+          与投资组合联动<br>
+          辅助久期/杠杆/仓位决策
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════ -->
+<footer>
+  <div class="wrap">
+    <span>研究中心（固收）</span> × IT 团队联合建设 &nbsp;|&nbsp; 2026年7月
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     CONFIGURABLE DELIVERABLES DATA
+     ═══════════════════════════════════════════ -->
+<script>
+/*
+ * ═══════════════════════════════════════════════════════
+ * 可配置交付物卡片列表
+ *
+ * 添加新报告：复制下面任一行，修改字段即可
+ * 字段说明：
+ *   id       - 唯一标识（任意字符串）
+ *   title    - 卡片标题
+ *   tag      - 系统标签: 'agent' | 'quant' | 'cross'
+ *   tagText  - 标签文字: '五因子Agent系统' | '量化模型系统' | '跨资产条线'
+ *   desc     - 一句话简介
+ *   link     - HTML报告路径（相对或绝对路径）
+ *   linkText - 链接文字，默认"查看报告 →"
+ *   active   - true=可点击 / false=链接置灰显示"报告整理中"
+ * ═══════════════════════════════════════════════════════
+ */
+const DELIVERABLES = [
+  // ── 五因子Agent系统 ──
+  {
+    id: 'agent-system',
+    title: '五因子多Agent\n策略审计系统',
+    tag: 'agent',
+    tagText: '五因子Agent系统',
+    desc: '多Agent协作的债市策略审计框架，覆盖五因子评分→冲突识别→策略生成→反证审计的完整闭环。12个Agent各司其职，输出结构化策略审计报告。',
+    link: '#',
+    linkText: '查看报告 →',
+    active: false
+  },
+  {
+    id: 'policy-gap',
+    title: '政策-舆情-预期差\nSkill (v3)',
+    tag: 'agent',
+    tagText: '五因子Agent系统',
+    desc: '跟踪央行表态、政治局会议、国常会等政策信号，量化政策预期差及其市场影响。已完成2年历史回测验证，迭代至第3版。',
+    link: '#',
+    linkText: '查看报告 →',
+    active: false
+  },
+
+  // ── 量化模型系统 ──
+  {
+    id: 'macro-index',
+    title: '宏观高频景气指数',
+    tag: 'quant',
+    tagText: '量化模型系统',
+    desc: '追踪经济增长、通胀、融资需求等维度的综合景气判断。已完成第二轮指标迭代，提供宏观方向的量化参考信号。',
+    link: '#',
+    linkText: '查看报告 →',
+    active: false
+  },
+  {
+    id: 'liquidity-model',
+    title: '流动性量化模型',
+    tag: 'quant',
+    tagText: '量化模型系统',
+    desc: '建模DR007、存单利率等资金利率的中枢与边际变化。正在升级为日度信号+信号强度值，并计划与存单模型关联。',
+    link: '#',
+    linkText: '查看报告 →',
+    active: false
+  },
+  {
+    id: 'sentiment-timing',
+    title: '机构情绪择时指数',
+    tag: 'quant',
+    tagText: '量化模型系统',
+    desc: '从机构行为和市场情绪中提取对10Y国债有择时意义的因子。已上线，每日邮件自动推送最新信号。',
+    link: '#',
+    linkText: '查看报告 →',
+    active: false
+  },
+  {
+    id: 'sentiment-sync',
+    title: '机构情绪同步指数',
+    tag: 'quant',
+    tagText: '量化模型系统',
+    desc: '衡量市场整体交易热度（过冷/中性/过热），与10Y国债高度同步。辅助判断市场是否对利空更敏感、需要仓位管理。',
+    link: '#',
+    linkText: '查看报告 →',
+    active: false
+  },
+
+  // ── 跨资产条线 ──
+  {
+    id: 'cross-asset',
+    title: '跨资产周度复盘 Skill',
+    tag: 'cross',
+    tagText: '跨资产条线',
+    desc: '整合债券、股票、商品、汇率的周度信号，形成跨市场验证闭环。初步版本已形成，持续完善中。',
+    link: '#',
+    linkText: '查看报告 →',
+    active: false
+  },
+];
+
+// ══════════════════════════════════════════════
+// RENDER CARDS (do not edit below this line)
+// ══════════════════════════════════════════════
+(function renderCards() {
+  const grid = document.getElementById('deliverable-cards');
+  if (!grid) return;
+
+  DELIVERABLES.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const tag = document.createElement('span');
+    tag.className = 'card-tag ' + d.tag;
+    tag.textContent = d.tagText;
+
+    const h4 = document.createElement('h4');
+    h4.textContent = d.title;
+
+    const p = document.createElement('p');
+    p.textContent = d.desc;
+
+    const link = document.createElement('a');
+    link.className = 'card-link' + (d.active ? '' : ' disabled');
+    link.href = d.active ? d.link : '#';
+    link.target = d.active ? '_blank' : '_self';
+    link.textContent = d.linkText || '查看报告 →';
+    if (!d.active) {
+      link.addEventListener('click', e => e.preventDefault());
+      link.title = '报告整理中，敬请期待';
+    }
+
+    card.appendChild(tag);
+    card.appendChild(h4);
+    card.appendChild(p);
+    card.appendChild(link);
+    grid.appendChild(card);
+  });
+})();
+</script>
+
+
+</body></html>
