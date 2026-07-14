@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>债市五因子多Agent策略审计系统 | 2026-07-03</title>
+<title>债市五因子多Agent策略审计系统 | 2026-07-10</title>
 <link rel="preconnect" href="https://fonts.googleapis.com/">
 <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&family=Noto+Serif+SC:wght@600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,7 +15,6 @@
   --rule:#E5E2DC; --card-bg:#FFFFFF;
   --bull:#8B1E2A; --bear:#2D5F7C; --neutral:#6B5E53;
   --shadow:0 1px 3px rgba(28,33,39,0.06),0 1px 2px rgba(28,33,39,0.04);
-  --shadow-hv:0 8px 24px rgba(28,33,39,0.10),0 2px 8px rgba(28,33,39,0.06);
   --radius:6px; --radius-lg:12px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -23,168 +22,131 @@ html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;}
 body{font-family:'Noto Sans SC',system-ui,-apple-system,sans-serif;font-weight:400;font-size:15px;line-height:1.75;color:var(--text);background:var(--bg);}
 h1,h2,h3,h4,h5{font-family:'Noto Serif SC','SimSun',serif;}
 .mono{font-family:'JetBrains Mono','Cascadia Code',monospace;}
-
 .wrap{max-width:1080px;margin:0 auto;padding:0 40px;}
 section{padding:48px 0;}
 .section-rule{border-top:1px solid var(--rule);}
-
 .sec-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.12em;color:var(--accent);text-transform:uppercase;margin-bottom:16px;}
 .sec-title{font-family:'Noto Serif SC',serif;font-size:28px;font-weight:700;line-height:1.3;color:var(--text);margin-bottom:12px;letter-spacing:-0.01em;}
-.sec-sub{font-family:'Noto Sans SC',sans-serif;font-size:15px;font-weight:300;color:var(--text-muted);line-height:1.7;max-width:680px;margin-bottom:32px;}
-
-/* HERO */
 .hero{padding:60px 0 40px;}
-.hero .wrap{display:flex;align-items:center;gap:48px;}
-.hero-left{flex:1;}
-.hero-right{flex:0 0 220px;display:flex;align-items:center;justify-content:center;}
 .hero h1{font-family:'Noto Serif SC',serif;font-size:34px;font-weight:900;line-height:1.25;letter-spacing:-0.02em;margin-bottom:16px;}
 .hero h1 em{font-style:normal;color:var(--accent);}
-.hero-desc{font-size:16px;font-weight:300;color:var(--text-muted);line-height:1.8;max-width:540px;margin-bottom:16px;}
+.hero-desc{font-size:16px;font-weight:300;color:var(--text-muted);line-height:1.8;max-width:640px;margin-bottom:16px;}
 .hero-signature{font-size:13px;color:var(--text-muted);}
 .hero-signature span{color:var(--accent);font-weight:500;}
-
-#radar-svg{width:220px;height:220px;}
-.radar-label{font-family:'Noto Sans SC',sans-serif;font-size:12px;fill:var(--text);}
-.radar-label-muted{font-size:10px;fill:var(--text-muted);}
-.radar-label-pending{font-size:10px;fill:var(--text-muted);font-style:italic;}
-
-/* VERDICT */
 .verdict-box{background:var(--card-bg);border:1px solid var(--rule);border-radius:var(--radius-lg);padding:24px 28px;box-shadow:var(--shadow);margin-bottom:24px;border-left:4px solid var(--accent);}
 .verdict-box .verdict-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
 .verdict-box .verdict-text{font-size:16px;font-weight:600;color:var(--text);line-height:1.7;}
-
-/* CARDS */
 .card{background:var(--card-bg);border-radius:var(--radius-lg);border:1px solid var(--rule);margin-bottom:20px;overflow:hidden;box-shadow:var(--shadow);}
-.card-header{padding:16px 24px;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:8px;}
-.card-header .num{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);font-weight:500;}
-.card-header h3{font-size:17px;font-weight:700;color:var(--text);}
 .card-body{padding:20px 24px;}
-
-/* TABLES */
 table{width:100%;border-collapse:collapse;font-size:13px;}
-th{background:var(--data-light);padding:8px 10px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:11px;color:var(--text-muted);white-space:nowrap;font-family:'Noto Sans SC',sans-serif;}
+th{background:var(--data-light);padding:8px 10px;text-align:left;font-weight:600;border-bottom:2px solid var(--rule);font-size:11px;color:var(--text-muted);white-space:nowrap;}
 td{padding:7px 10px;border-bottom:1px solid var(--rule);font-size:12.5px;}
 .pos{color:var(--bull);font-weight:600;}
 .neg{color:var(--bear);font-weight:600;}
 .zero{color:#9ca3af;}
 tr.subtotal td{font-weight:700;background:var(--data-light);border-top:2px solid var(--rule);}
-
-/* TAGS */
-.tag{display:inline-block;padding:3px 10px;border-radius:3px;font-size:11px;font-weight:500;letter-spacing:0.03em;font-family:'Noto Sans SC',sans-serif;}
+.tag{display:inline-block;padding:3px 10px;border-radius:3px;font-size:11px;font-weight:500;}
 .tag-bull{background:rgba(139,30,42,0.1);color:var(--bull);}
 .tag-bear{background:rgba(45,95,124,0.1);color:var(--bear);}
 .tag-neu{background:rgba(107,94,83,0.1);color:var(--neutral);}
 .tag-pending{background:rgba(196,163,90,0.12);color:#92702A;border:1px dashed #C4A35A;}
-
-/* CHAIN BOXES */
 .chain-box{padding:16px 20px;border-radius:var(--radius);margin:12px 0;font-size:14px;line-height:1.8;}
 .main-chain{background:rgba(139,30,42,0.04);border-left:4px solid var(--accent);}
 .risk-chain{background:rgba(45,95,124,0.04);border-left:4px solid var(--data);}
 .grey-swan{background:rgba(107,94,83,0.04);border-left:4px solid var(--neutral);}
 .chain-label{font-family:'Noto Serif SC',serif;font-size:15px;font-weight:700;display:block;margin-bottom:6px;}
-
-/* AUDIT */
 .audit-item{margin-bottom:14px;padding:14px 18px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--rule);}
 .audit-item .q{font-family:'Noto Serif SC',serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px;}
 .audit-item .q::before{content:'▸ ';color:var(--accent);}
 .audit-item .a{font-size:13px;color:var(--text-muted);line-height:1.7;}
-
-/* STATS */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;}
-.stat-box{text-align:center;padding:16px 8px;border-radius:var(--radius);background:var(--bg);border:1px solid var(--rule);}
-.stat-box .label{font-size:11px;color:var(--text-muted);margin-bottom:4px;}
-.stat-box .value{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:600;color:var(--data);line-height:1.1;}
-.stat-box .hint{font-size:10px;color:var(--text-muted);margin-top:2px;}
-
-/* CALLOUTS */
 .callout{padding:14px 18px;border-radius:var(--radius);margin:12px 0;font-size:13px;line-height:1.7;}
-.callout-warn{background:rgba(196,163,90,0.08);border-left:4px solid #C4A35A;}
-.callout-info{background:var(--data-light);border-left:4px solid var(--data);}
 .callout-pending{background:rgba(196,163,90,0.06);border:1px dashed #C4A35A;border-radius:var(--radius);}
-
-/* FOOTER */
 footer{padding:32px 0;text-align:center;font-size:13px;color:var(--text-muted);border-top:1px solid var(--rule);}
 footer span{color:var(--accent);}
 </style>
 </head>
 <body>
 
-<!-- ═══ HERO ═══ -->
 <section class="hero">
   <div class="wrap">
-    <div class="hero-left" style="flex:1;">
-      <h1>债市五因子多Agent<br><em>策略审计系统</em></h1>
-      <p class="hero-desc">
-        基于基本面、流动性、机构行为与市场情绪三因子的四维评分，经合议审计生成主链条判断、反方审计与三窗口策略建议。<strong>政策因子与市场定价因子待嵌入</strong>，当前为三因子运行版本。
-      </p>
-      <p class="hero-signature"><span>评估日期：2026-07-03</span> &nbsp;|&nbsp; 审计版本：v1.0 &nbsp;|&nbsp; 三因子版</p>
-    </div>
+    <h1>债市五因子多Agent<br><em>策略审计系统</em></h1>
+    <p class="hero-desc">
+      基于基本面、流动性、机构行为与市场情绪三因子的四维评分，经合议审计生成主链条判断、反方审计与三窗口策略建议。<strong>政策因子与市场定价因子待嵌入</strong>，当前为三因子运行版本。
+    </p>
+    <p class="hero-signature"><span>评估日期：2026-07-10</span> &nbsp;|&nbsp; 审计版本：v1.0 &nbsp;|&nbsp; 三因子版</p>
   </div>
 </section>
 
 <div class="section-rule"></div>
 
-<!-- ═══ 总判断 ═══ -->
 <section style="padding:32px 0;">
   <div class="wrap">
     <div class="verdict-box">
       <div class="verdict-eyebrow">总判断</div>
-      <div class="verdict-text">利率延续区间震荡格局，三大因子均无突破性信号。流动性（conf=+5）提供底部支撑，机构行为虽偏空但边际已转正（+0.13）。平均有效置信度2.13→仓位基准100%。10Y国债大概率在 1.70%~1.78% 窄幅波动。</div>
+      <div class="verdict-text">三因子全部落入中性区间（|net|均<0.4，置信度均为+1），市场处于方向选择期。机构行为边际转正（+0.35）提供弱支撑，流动性维持中性偏多（DR007-OMO处于17%分位低位），但逆回购余额降至620亿（10%分位），央行有回收流动性的意图。当前信号强度不足以支撑方向性判断，10Y国债预计在 1.72%~1.78% 继续震荡。</div>
     </div>
   </div>
 </section>
 
-<!-- ═══ 一、因子投票汇总 ═══ -->
 <section style="padding:32px 0;">
   <div class="wrap">
     <div class="sec-eyebrow">01 / 因子投票汇总</div>
     <h2 class="sec-title">五因子投票（三因子已接入）</h2>
-
     <div class="card">
       <div class="card-body" style="padding:16px 20px;">
         <table>
-          <tr><th>因子</th><th>状态</th><th>方向</th><th>Net Signal</th><th>边际分</th><th>置信度</th><th>有效权重</th><th>一句话逻辑</th></tr>
+          <tr><th>因子</th><th>状态</th><th>方向</th><th>Net</th><th>边际分</th><th>置信度</th><th>有效权重</th><th>一句话逻辑</th></tr>
           <tr>
             <td><strong>基本面</strong></td><td><span class="tag tag-bull">已接入</span></td>
             <td><span class="tag tag-bull">中性偏多</span></td>
-            <td class="pos">+0.32</td><td class="neg">-0.55</td><td>+1</td>
+            <td class="pos">+0.38</td><td class="neg">-0.28</td><td>+1</td>
             <td><span class="tag tag-neu">70%</span></td>
-            <td style="font-size:12px">开工率/消费疲弱支撑，但边际煤炭和港口反弹削弱利多；内部一致性仅14%</td>
+            <td style="font-size:12px">30城商品房同比转正(+3.4%)削弱利多；沥青/乘用车仍低位支撑，但7个指标中State与Marginal方向严重分歧（仅1/7同向），各指标指向不一致，信号可信度低</td>
           </tr>
           <tr>
             <td><strong>流动性</strong></td><td><span class="tag tag-bull">已接入</span></td>
             <td><span class="tag tag-bull">中性偏多</span></td>
-            <td class="pos">+0.34</td><td class="pos">+0.34</td><td class="pos">+5</td>
-            <td><span class="tag tag-bull">100%</span></td>
-            <td style="font-size:12px">资金利率历史低位形成坚实底部，一致性88%最高；政府债净融资6046亿构成供给压力</td>
+            <td class="pos">+0.28</td><td class="pos">+0.18</td><td>+1</td>
+            <td><span class="tag tag-neu">70%</span></td>
+            <td style="font-size:12px">DR007-OMO利差-1.75bp（17%分位）显示资金面仍宽松；但逆回购余额骤降至620亿（10%分位），央行回收流动性意图明显</td>
           </tr>
           <tr>
             <td><strong>机构行为</strong></td><td><span class="tag tag-bull">已接入</span></td>
-            <td><span class="tag tag-bear">中性偏空</span></td>
-            <td class="neg">-0.30</td><td class="pos">+0.13</td><td>+1</td>
+            <td><span class="tag tag-bull">中性偏多</span></td>
+            <td class="pos">+0.18</td><td class="pos">+0.35</td><td>+1</td>
             <td><span class="tag tag-neu">70%</span></td>
-            <td style="font-size:12px">TKN占比回落+利差偏高构成state利空，但日度边际已转正；⚠拥挤反转已触发</td>
+            <td style="font-size:12px">基金净买入转正(+159亿)，TKN占比反弹，IB子因子边际+0.47；但杠杆率仍极低（9.6%分位），改善持续性待观察</td>
           </tr>
           <tr style="background:rgba(196,163,90,0.04);">
             <td><strong>政策面</strong></td><td><span class="tag tag-pending">待嵌入</span></td>
             <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
-            <td style="font-size:12px;color:var(--text-muted)">政策舆情预期差V3系统已完成算法设计，Skill包待安装后接入</td>
+            <td style="font-size:12px;color:var(--text-muted)">政策舆情预期差V3系统待Skill包安装后接入</td>
           </tr>
           <tr style="background:rgba(196,163,90,0.04);">
             <td><strong>市场定价</strong></td><td><span class="tag tag-pending">待嵌入</span></td>
             <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
-            <td style="font-size:12px;color:var(--text-muted)">期货持仓、期权隐含波动率等市场结构数据待接入</td>
+            <td style="font-size:12px;color:var(--text-muted)">期货持仓、期权隐含波动率等待接入</td>
           </tr>
         </table>
-
         <div class="callout callout-pending" style="margin-top:14px;">
-          <strong>⏳ 政策因子嵌入进度：</strong>「政策-舆情-预期差V3」算法说明书已完成定稿，映射至四维评分的框架已设计完毕（State=Policy_n×5, Surprise=Gap×5）。需安装 <code class="mono">cb-text-policy-tone</code> Skill包并配置Gangtise/Wind/IMA数据源后即可上线。预计嵌入后平均置信度将从2.13调整至1.80，仓位基准从100%降至70%。
+          <strong>⏳ 政策因子嵌入进度：</strong>「政策-舆情-预期差V3」算法已完成定稿，映射框架已设计（State=Policy_n×5, Surprise=Gap×5）。需安装 <code class="mono">cb-text-policy-tone</code> Skill包并配置Gangtise/Wind/IMA数据源后即可上线。
         </div>
-
         <div style="margin-top:14px;font-size:12px;color:var(--text-muted);">
-          <strong>置信度过滤器（当前三因子）：</strong>
-          基本面(+1)→70% | 流动性(+5)→100% | 机构行为(+1)→70%<br>
-          平均有效置信度 ≈ (1×0.7 + 5×1.0 + 1×0.7) / 3 = <strong style="color:var(--accent);">2.13</strong> → 仓位基准：正常仓位（100%）
+          <strong>置信度过滤器：</strong>基本面(+1)→70% | 流动性(+1)→70% | 机构行为(+1)→70%<br>
+          平均有效置信度 = <strong style="color:var(--accent);">1.00</strong> → 仓位基准：70%折扣（落入0~+2区间）
+        </div>
+        <div style="margin-top:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius);font-size:11px;color:var(--text-muted);line-height:1.8;">
+          <strong>计算说明：</strong><br>
+          ① <strong>Net Signal</strong> = 0.30×State + 0.40×Marginal + 0.30×Surprise，范围[-5,+5]，正=利多债市，负=利空债市<br>
+          ② <strong>State</strong> = (历史分位-50%)/50% × 方向系数d × 5，衡量当前水位偏高/偏低<br>
+          ③ <strong>Marginal</strong> = (当前值-前值)/历史变动标准差 × d × 1.5，衡量边际变化方向与力度<br>
+          ④ <strong>Surprise</strong> = (当前值-近3月趋势)/残差标准差 × d，衡量是否超预期<br>
+          ⑤ <strong>方向系数d</strong>：d=+1表示指标上升→利多债市（如大行净融出↑=放水），d=-1表示指标上升→利空债市（如DR007-OMO↑=收紧）。基本面全部d=-1，流动性混合（大行净融出/逆回购余额d=+1，其余d=-1），机构行为IB子因子d=+1、CP子因子d=-1<br>
+          ⑥ <strong>Confidence</strong> = 覆盖度分 + 一致性分 + 时效性分 + 有效性分，基准0，范围[-5,+5]<br>
+          &nbsp;&nbsp;&nbsp;覆盖度：100%→+1 | 80-100%→0 | 60-80%→-1 | &lt;60%→-2<br>
+          &nbsp;&nbsp;&nbsp;一致性：&gt;80%同向→+2 | 70-80%→+1 | 60-70%→0 | 50-60%→-1 | &lt;50%→-2<br>
+          &nbsp;&nbsp;&nbsp;时效性：全部≤评估日→+1 | 1-2个滞后→-1 | &gt;2个→-2<br>
+          &nbsp;&nbsp;&nbsp;有效性：近期与利率相关稳定→+1 | 近期常失效→-2
         </div>
       </div>
     </div>
@@ -193,240 +155,195 @@ footer span{color:var(--accent);}
 
 <div class="section-rule"></div>
 
-<!-- ═══ 一·附：评分明细 ═══ -->
 <section style="padding:32px 0;">
   <div class="wrap">
     <div class="sec-eyebrow">01·附 / 四维评分明细</div>
     <h2 class="sec-title">各因子完整评分明细</h2>
+    <div class="card"><div class="card-body">
 
-    <div class="card">
-      <div class="card-body">
-
-        <h4 style="font-size:15px;margin-bottom:8px;">基本面因子 <span style="font-weight:400;font-size:12px;color:var(--text-muted)">(7指标等权 d=-1 / 5年分位)</span></h4>
-        <div style="display:flex;gap:16px;margin-bottom:10px;font-size:13px;">
-          <span>State: <strong class="pos">+1.48</strong></span>
-          <span>Marginal: <strong class="neg">-0.55</strong></span>
-          <span>Surprise: <strong class="pos">+0.31</strong></span>
-          <span>Confidence: <strong style="color:var(--data)">+1</strong></span>
-          <span>Net: <strong class="zero">+0.32</strong></span>
-        </div>
-        <table>
-          <tr><th>指标</th><th>当前值</th><th>前值</th><th>5Y分位</th><th>State</th><th>Marginal</th><th>Surprise</th></tr>
-          <tr><td>煤炭耗煤量同比</td><td>+0.2%</td><td>-8.3%</td><td>48.9%</td><td class="pos">+0.11</td><td class="neg">-1.42</td><td class="neg">-0.20</td></tr>
-          <tr><td>沥青开工率同比</td><td>-49.8%</td><td>-49.8%</td><td>2.7%</td><td class="pos">+4.73</td><td class="zero">0.00</td><td class="pos">+1.63</td></tr>
-          <tr><td>30城商品房同比</td><td>-21.7%</td><td>-14.1%</td><td>41.0%</td><td class="pos">+0.90</td><td class="pos">+0.04</td><td class="pos">+0.23</td></tr>
-          <tr><td>港口集装箱同比</td><td>+8.1%</td><td>+2.0%</td><td>53.0%</td><td class="neg">-0.30</td><td class="neg">-0.93</td><td class="neg">-0.11</td></tr>
-          <tr><td>乘用车零售同比</td><td>-18.0%</td><td>-29.0%</td><td>14.6%</td><td class="pos">+3.54</td><td class="neg">-0.62</td><td class="pos">+0.56</td></tr>
-          <tr><td>布伦特原油同比</td><td>+10.0%</td><td>+5.2%</td><td>62.5%</td><td class="neg">-1.25</td><td class="neg">-0.86</td><td class="neg">-0.27</td></tr>
-          <tr><td>农产品批发同比</td><td>-2.6%</td><td>-2.6%</td><td>23.5%</td><td class="pos">+2.65</td><td class="neg">-0.09</td><td class="pos">+0.34</td></tr>
-        </table>
-
-        <hr style="margin:20px 0;border:none;border-top:1px solid var(--rule);">
-
-        <h4 style="font-size:15px;margin-bottom:8px;">流动性因子 <span style="font-weight:400;font-size:12px;color:var(--text-muted)">(8指标加权 / 3年分位)</span></h4>
-        <div style="display:flex;gap:16px;margin-bottom:10px;font-size:13px;">
-          <span>State: <strong class="pos">+0.99</strong></span>
-          <span>Marginal: <strong class="pos">+0.34</strong></span>
-          <span>Surprise: <strong class="neg">-0.33</strong></span>
-          <span>Confidence: <strong style="color:var(--data)">+5</strong></span>
-          <span>Net: <strong class="pos">+0.34</strong></span>
-        </div>
-        <table>
-          <tr><th>指标</th><th>d</th><th>权重</th><th>当前值</th><th>5日前</th><th>3Y分位</th><th>State</th><th>Marginal</th><th>Surprise</th></tr>
-          <tr><td>DR001</td><td>-1</td><td>20%</td><td>1.361%</td><td>1.405%</td><td>28.1%</td><td class="pos">+2.35</td><td class="pos">+1.53</td><td class="neg">-0.77</td></tr>
-          <tr><td>R001</td><td>-1</td><td>15%</td><td>1.386%</td><td>1.436%</td><td>22.1%</td><td class="pos">+3.08</td><td class="pos">+1.45</td><td class="pos">+0.46</td></tr>
-          <tr><td>大行净融出</td><td>+1</td><td>15%</td><td>35491亿</td><td>37360亿</td><td>26.4%</td><td class="neg">-2.36</td><td class="neg">-0.96</td><td class="neg">-0.53</td></tr>
-          <tr><td>IRS-FR007</td><td>-1</td><td>15%</td><td>1.429%</td><td>1.437%</td><td>1.0%</td><td class="pos">+4.91</td><td class="pos">+1.45</td><td class="pos">+1.41</td></tr>
-          <tr><td>逆回购余额</td><td>+1</td><td>10%</td><td>6785亿</td><td>8470亿</td><td>60.8%</td><td class="pos">+1.08</td><td class="neg">-1.06</td><td class="pos">+0.15</td></tr>
-          <tr><td>SHIBOR 3M</td><td>-1</td><td>10%</td><td>1.435%</td><td>1.437%</td><td>4.4%</td><td class="pos">+4.56</td><td class="pos">+1.00</td><td class="neg">-0.24</td></tr>
-          <tr><td>存单净融资</td><td>-1</td><td>7.5%</td><td>3145亿</td><td>2866亿</td><td>91.3%</td><td class="neg">-4.13</td><td class="neg">-0.14</td><td class="neg">-1.62</td></tr>
-          <tr><td>政府债净融资</td><td>-1</td><td>7.5%</td><td>6046亿</td><td>-2832亿</td><td>95.4%</td><td class="neg">-4.54</td><td class="neg">-3.16</td><td class="neg">-1.44</td></tr>
-        </table>
-
-        <hr style="margin:20px 0;border:none;border-top:1px solid var(--rule);">
-
-        <h4 style="font-size:15px;margin-bottom:8px;">机构行为与市场情绪因子 <span style="font-weight:400;font-size:12px;color:var(--text-muted)">(13指标两阶段 / 1年分位)</span></h4>
-        <div style="display:flex;gap:16px;margin-bottom:10px;font-size:13px;">
-          <span>State: <strong class="neg">-0.93</strong></span>
-          <span>Marginal: <strong class="pos">+0.13</strong></span>
-          <span>Surprise: <strong class="neg">-0.25</strong></span>
-          <span>Confidence: <strong style="color:var(--data)">+1</strong></span>
-          <span>Net: <strong class="neg">-0.30</strong></span>
-        </div>
-
-        <div style="font-size:13px;font-weight:600;margin:10px 0 6px;color:var(--text-muted);font-family:'Noto Serif SC',serif;">机构行为子因子（权重75%，d=+1，上升=利多）</div>
-        <table>
-          <tr><th>指标</th><th>权重</th><th>当前值</th><th>前值</th><th>1Y分位</th><th>State</th><th>Marginal</th><th>Surprise</th></tr>
-          <tr><td>久期中位数 ⚠</td><td>16%</td><td>4.64年</td><td>4.66年</td><td>75.2%</td><td class="pos">+2.51</td><td class="neg">-0.64</td><td class="pos">+0.35</td></tr>
-          <tr><td>基金净买入</td><td>18%</td><td>-74亿</td><td>-503亿</td><td>17.5%</td><td class="neg">-3.25</td><td class="pos">+1.81</td><td class="neg">-0.85</td></tr>
-          <tr><td>7-10Y TKN占比</td><td>12%</td><td>39.5%</td><td>50.4%</td><td>14.3%</td><td class="neg">-3.57</td><td class="neg">-1.26</td><td class="neg">-1.47</td></tr>
-          <tr><td>20-30Y TKN占比</td><td>10%</td><td>45.6%</td><td>49.1%</td><td>30.5%</td><td class="neg">-1.95</td><td class="neg">-0.53</td><td class="neg">-0.96</td></tr>
-          <tr><td>普信债TKN占比</td><td>8%</td><td>67.5%</td><td>68.2%</td><td>44.7%</td><td class="neg">-0.53</td><td class="neg">-0.14</td><td class="neg">-0.53</td></tr>
-          <tr><td>杠杆率</td><td>14%</td><td>106.8%</td><td>106.5%</td><td>8.5%</td><td class="neg">-4.15</td><td class="pos">+0.95</td><td class="pos">+0.52</td></tr>
-          <tr><td>7-10Y成交笔数</td><td>8%</td><td>5793笔</td><td>3683笔</td><td>54.8%</td><td class="pos">+0.48</td><td class="pos">+1.01</td><td class="neg">-0.12</td></tr>
-          <tr><td>20-30Y成交笔数</td><td>8%</td><td>18157笔</td><td>16778笔</td><td>89.3%</td><td class="pos">+3.93</td><td class="pos">+0.63</td><td class="pos">+0.06</td></tr>
-          <tr><td>普信债成交笔数</td><td>6%</td><td>7816笔</td><td>6511笔</td><td>87.2%</td><td class="pos">+3.72</td><td class="pos">+1.13</td><td class="pos">+0.21</td></tr>
-          <tr class="subtotal"><td colspan="2">IB加权汇总</td><td colspan="2">75%</td><td></td><td class="neg">-1.10</td><td class="pos">+0.34</td><td class="neg">-0.33</td></tr>
-        </table>
-
-        <div style="font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--text-muted);font-family:'Noto Serif SC',serif;">票息图谱子因子（权重25%，d=-1，上升=利空）<span style="font-size:11px;font-weight:400"> — 数据来源：票息图谱_20260703_完整版.xlsx</span></div>
-        <table>
-          <tr><th>指标</th><th>权重</th><th>当前值</th><th>前值</th><th>1Y分位</th><th>State</th><th>Marginal</th><th>Surprise</th></tr>
-          <tr><td>国开-国债10Y利差 ⚠</td><td>30%</td><td>5.07bp</td><td>5.20bp</td><td>10.0%</td><td class="pos">+2.80</td><td class="pos">+0.23</td><td class="pos">+0.47</td></tr>
-          <tr><td>10Y国债-1Y存单利差</td><td>25%</td><td>28.38bp</td><td>27.60bp</td><td>78.8%</td><td class="neg">-2.88</td><td class="neg">-1.10</td><td class="pos">+0.24</td></tr>
-          <tr><td>30Y-10Y国债利差</td><td>25%</td><td>52.22bp</td><td>51.70bp</td><td>91.2%</td><td class="neg">-4.12</td><td class="neg">-0.72</td><td class="neg">-0.84</td></tr>
-          <tr><td>10Y国债-7D逆回购 ⚠</td><td>20%</td><td>34.63bp</td><td>34.10bp</td><td>24.4%</td><td class="pos">+2.53</td><td class="neg">-0.63</td><td class="pos">+0.06</td></tr>
-          <tr class="subtotal"><td colspan="2">CP加权汇总</td><td colspan="2">25%</td><td></td><td class="neg">-0.40</td><td class="neg">-0.51</td><td class="zero">0.00</td></tr>
-        </table>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">⚠ 触发拥挤反转惩罚 | 因子合成 = 0.75×IB + 0.25×CP</div>
-
-      </div>
-    </div>
+<h4 style="font-size:15px;margin-bottom:8px;">基本面因子 <span style="font-weight:400;font-size:12px;color:var(--text-muted)">(7指标等权 d=-1 / 5年分位)</span></h4>
+<div style="display:flex;gap:16px;margin-bottom:10px;font-size:13px;">
+  <span>State: <strong class="pos">+1.28</strong></span>
+  <span>Marginal: <strong class="neg">-0.28</strong></span>
+  <span>Surprise: <strong class="pos">+0.36</strong></span>
+  <span>Confidence: <strong style="color:var(--data)">+1</strong></span>
+  <span>Net: <strong class="pos">+0.38</strong></span>
+</div>
+<table>
+  <tr><th>指标</th><th>当前值</th><th>前值</th><th>5Y分位</th><th>State</th><th>Marginal</th><th>Surprise</th></tr>
+  <tr><td>煤炭耗煤量</td><td>+0.2%</td><td>-8.3%</td><td>48.9%</td><td class="pos">+0.11</td><td class="neg">-1.40</td><td class="neg">-0.20</td></tr>
+  <tr><td>沥青开工率</td><td>-49.8%</td><td>-49.8%</td><td>2.8%</td><td class="pos">+4.72</td><td class="zero">+0.00</td><td class="pos">+1.63</td></tr>
+  <tr><td>30城商品房</td><td>+3.4%</td><td>-21.7%</td><td>77.2%</td><td class="neg">-2.72</td><td class="neg">-0.15</td><td class="pos">+0.05</td></tr>
+  <tr><td>港口集装箱</td><td>+4.6%</td><td>+8.1%</td><td>28.0%</td><td class="pos">+2.20</td><td class="pos">+0.53</td><td class="pos">+0.36</td></tr>
+  <tr><td>乘用车零售</td><td>-18.0%</td><td>-29.0%</td><td>14.8%</td><td class="pos">+3.52</td><td class="neg">-0.61</td><td class="pos">+0.56</td></tr>
+  <tr><td>布伦特原油</td><td>+6.1%</td><td>+10.0%</td><td>60.4%</td><td class="neg">-1.04</td><td class="pos">+0.70</td><td class="neg">-0.11</td></tr>
+  <tr><td>农产品批发</td><td>-1.7%</td><td>-2.6%</td><td>28.0%</td><td class="pos">+2.20</td><td class="neg">-1.02</td><td class="pos">+0.24</td></tr>
+</table>
+<hr style="margin:20px 0;border:none;border-top:1px solid var(--rule);">
+<h4 style="font-size:15px;margin-bottom:8px;">流动性因子 <span style="font-weight:400;font-size:12px;color:var(--text-muted)">(7指标加权 / 3年分位)</span></h4>
+<div style="display:flex;gap:16px;margin-bottom:10px;font-size:13px;">
+  <span>State: <strong class="pos">+0.64</strong></span>
+  <span>Marginal: <strong class="pos">+0.18</strong></span>
+  <span>Surprise: <strong class="pos">+0.06</strong></span>
+  <span>Confidence: <strong style="color:var(--data)">+1</strong></span>
+  <span>Net: <strong class="pos">+0.28</strong></span>
+</div>
+<table>
+  <tr><th>指标</th><th>d</th><th>权重</th><th>当前值</th><th>5日前</th><th>3Y分位</th><th>State</th><th>Marginal</th><th>Surprise</th></tr>
+  <tr><td>DR007-OMO</td><td>-1</td><td>20%</td><td>-1.75bp</td><td>-2.21bp</td><td>17.2%</td><td class="pos">+3.28</td><td class="neg">-0.12</td><td class="pos">+0.02</td></tr>
+  <tr><td>大行净融出</td><td>+1</td><td>15%</td><td>41646亿</td><td>42279亿</td><td>26.0%</td><td class="neg">-2.40</td><td class="neg">-0.32</td><td class="pos">+0.31</td></tr>
+  <tr><td>IRS-FR007</td><td>-1</td><td>15%</td><td>1.4274%</td><td>1.4243%</td><td>4.0%</td><td class="pos">+4.60</td><td class="neg">-0.61</td><td class="pos">+1.33</td></tr>
+  <tr><td>逆回购余额</td><td>+1</td><td>12%</td><td>620亿</td><td>1050亿</td><td>10.0%</td><td class="neg">-4.00</td><td class="neg">-0.27</td><td class="neg">-0.87</td></tr>
+  <tr><td>SHIBOR 3M</td><td>-1</td><td>13%</td><td>1.4279%</td><td>1.4290%</td><td>13.6%</td><td class="pos">+3.64</td><td class="pos">+0.62</td><td class="neg">-0.15</td></tr>
+  <tr><td>存单净融资</td><td>-1</td><td>10%</td><td>-18亿</td><td>3145亿</td><td>48.8%</td><td class="pos">+0.12</td><td class="pos">+1.52</td><td class="neg">-0.21</td></tr>
+  <tr><td>政府债净融资</td><td>-1</td><td>15%</td><td>3276亿</td><td>6046亿</td><td>73.6%</td><td class="neg">-2.36</td><td class="pos">+0.98</td><td class="neg">-0.29</td></tr>
+</table>
+<hr style="margin:20px 0;border:none;border-top:1px solid var(--rule);">
+<h4 style="font-size:15px;margin-bottom:8px;">机构行为与市场情绪因子 <span style="font-weight:400;font-size:12px;color:var(--text-muted)">(13指标两阶段 / 1年分位)</span></h4>
+<div style="display:flex;gap:16px;margin-bottom:10px;font-size:13px;">
+  <span>State: <strong class="pos">+0.13</strong></span>
+  <span>Marginal: <strong class="pos">+0.35</strong></span>
+  <span>Surprise: <strong class="zero">+0.01</strong></span>
+  <span>Confidence: <strong style="color:var(--data)">+1</strong></span>
+  <span>Net: <strong class="pos">+0.18</strong></span>
+</div>
+<div style="font-size:13px;font-weight:600;margin:10px 0 6px;color:var(--text-muted);font-family:'Noto Serif SC',serif;">机构行为子因子（权重75%，d=+1）<span style="font-size:11px;font-weight:400"> st=+0.25 mg=+0.47 sp=-0.01</span></div>
+<table>
+  <tr><th>指标</th><th>权重</th><th>当前值</th><th>前值</th><th>1Y分位</th><th>State</th><th>Marginal</th><th>Surprise</th></tr>
+  <tr><td>久期中位数 </td><td>16%</td><td>4.69年</td><td>4.67年</td><td>67.6%</td><td class="pos">+1.76</td><td class="pos">+0.71</td><td class="pos">+0.26</td></tr>
+  <tr><td>基金净买入 </td><td>18%</td><td>159亿</td><td>8亿</td><td>56.0%</td><td class="pos">+0.60</td><td class="pos">+0.64</td><td class="neg">-0.09</td></tr>
+  <tr><td>7-10Y TKN% </td><td>12%</td><td>49.6%</td><td>45.6%</td><td>41.6%</td><td class="neg">-0.84</td><td class="pos">+0.46</td><td class="neg">-0.37</td></tr>
+  <tr><td>20-30Y TKN% </td><td>10%</td><td>57.7%</td><td>49.7%</td><td>76.4%</td><td class="pos">+2.64</td><td class="pos">+1.20</td><td class="pos">+0.76</td></tr>
+  <tr><td>普信债TKN% </td><td>8%</td><td>72.5%</td><td>73.0%</td><td>39.6%</td><td class="neg">-1.04</td><td class="neg">-0.10</td><td class="pos">+0.21</td></tr>
+  <tr><td>杠杆率 </td><td>14%</td><td>106.31%</td><td>106.02%</td><td>9.6%</td><td class="neg">-4.04</td><td class="pos">+1.00</td><td class="neg">-0.26</td></tr>
+  <tr><td>7-10Y成交 </td><td>8%</td><td>4438笔</td><td>5793笔</td><td>35.2%</td><td class="neg">-1.48</td><td class="neg">-0.65</td><td class="neg">-0.42</td></tr>
+  <tr><td>20-30Y成交 </td><td>8%</td><td>20385笔</td><td>18157笔</td><td>92.4%</td><td class="pos">+4.24</td><td class="pos">+1.02</td><td class="pos">+0.56</td></tr>
+  <tr><td>普信债成交 </td><td>6%</td><td>5674笔</td><td>7816笔</td><td>57.6%</td><td class="pos">+0.76</td><td class="neg">-1.86</td><td class="neg">-1.20</td></tr>
+  <tr class="subtotal"><td colspan="2">IB加权汇总</td><td colspan="2">75%</td><td></td><td class="pos">+0.25</td><td class="pos">+0.47</td><td class="zero">-0.01</td></tr>
+</table>
+<div style="font-size:13px;font-weight:600;margin:14px 0 6px;color:var(--text-muted);font-family:'Noto Serif SC',serif;">票息图谱子因子（权重25%，d=-1）<span style="font-size:11px;font-weight:400"> st=-0.23 mg=-0.02 sp=+0.09</span></div>
+<table>
+  <tr><th>指标</th><th>权重</th><th>当前值</th><th>前值</th><th>1Y分位</th><th>State</th><th>Marginal</th><th>Surprise</th></tr>
+  <tr><td>国开-国债10Y利差 ⚠</td><td>30%</td><td>4.82bp</td><td>4.99bp</td><td>6.4%</td><td class="pos">+2.74</td><td class="pos">+0.30</td><td class="pos">+0.45</td></tr>
+  <tr><td>10Y-1Y存单利差 </td><td>25%</td><td>27.73bp</td><td>27.51bp</td><td>75.6%</td><td class="neg">-2.56</td><td class="neg">-0.31</td><td class="pos">+0.32</td></tr>
+  <tr><td>30Y-10Y利差 </td><td>25%</td><td>51.32bp</td><td>51.39bp</td><td>88.0%</td><td class="neg">-3.80</td><td class="pos">+0.10</td><td class="neg">-0.60</td></tr>
+  <tr><td>10Y-7D逆回购 ⚠</td><td>20%</td><td>33.98bp</td><td>33.76bp</td><td>20.0%</td><td class="pos">+2.70</td><td class="neg">-0.26</td><td class="pos">+0.11</td></tr>
+  <tr class="subtotal"><td colspan="2">CP加权汇总</td><td colspan="2">25%</td><td></td><td class="neg">-0.23</td><td class="zero">-0.02</td><td class="pos">+0.09</td></tr>
+</table>
+<div style="font-size:11px;color:var(--text-muted);margin-top:6px;">⚠ 触发拥挤反转惩罚 | 因子合成 = 0.75×IB + 0.25×CP</div>
+</div></div></div></div>
+<div class="section-rule"></div>
+<section style="padding:32px 0;"><div class="wrap">
+  <div class="sec-eyebrow">02 / 主链条判断</div>
+  <h2 class="sec-title">主链条与风险链条</h2>
+  <div class="chain-box main-chain">
+    <span class="chain-label" style="color:var(--accent)">主链条：三因子中性偏多，但信号弱、置信度有限，实质为中性（情景概率：65%）</span>
+    <em style="font-size:12px;color:var(--text-muted);">注：情景概率指该情景成为下周债市主导逻辑的主观概率，非方向胜率。三条链条概率合计100%。</em><br><br>
+    <strong>需要强调的是，三个因子的 Net Signal 均低于 ±0.4，且置信度均为 +1（落入 0~+2 区间，有效权重仅 70%），在 [-5, +5] 的评分体系中属于典型的弱信号。</strong>因此主链条的"中性偏多"并非明确看多，而是"在没有强烈利空的前提下，市场更可能维持震荡、略微偏多"——本质上是<strong>中性判断</strong>，不构成方向性做多依据。<br><br>
+    在弱信号环境下，机构行为因子边际转正（marginal=+0.35）是相对最值得关注的正向变化：基金二级净买入从前周-74亿转为+159亿元，20-30Y TKN占比从45.6%反弹至57.7%（76%分位）。但该信号置信度仅 +1（一致性46%），改善的持续性有待观察。<br><br>
+    叠加<strong>基本面弱利多</strong>（net=+0.38）：沥青开工率-49.8%（2.8%分位）、乘用车-18%（14.8%分位）仍处历史低位。30城商品房同比从前周-21.7%转为+3.4%（77%分位），但单周数据转正尚不足以判断趋势企稳，<strong>需连续1-2个月企稳才能确认房地产高频数据拐点</strong>。<br><br>
+    <strong>流动性维持中性偏多</strong>（net=+0.28）：DR007-OMO利差-1.75bp（17%分位）显示资金面仍低于政策利率，IRS-FR007仍处4%分位低位。但逆回购余额从前周6785亿降至620亿（10%分位），<strong>央行有回收流动性的意图</strong>，后续资金面边际变化需密切关注。<br><br>
+    综合来看，三因子信号均偏弱且置信度有限→<strong>利率大概率维持震荡格局，方向性机会需等待更强信号出现</strong>。
   </div>
-</section>
+  <div class="chain-box risk-chain">
+    <span class="chain-label" style="color:var(--data)">风险链条：央行回收流动性+房地产数据边际改善推动利率小幅上行（情景概率：25%）</span>
+    <strong>逆回购余额620亿处于10%分位</strong>，央行有回收流动性的意图。若DR007-OMO利差从当前-1.75bp收窄至0bp以上，资金面可能从"偏宽松"转向"中性"，流动性因子可能转空。<br><br>
+    30城商品房同比转正（+3.4%）若在后续1-2个月得到延续确认，基本面因子的利多逻辑将有所弱化。叠加<strong>杠杆率仅106.3%（9.6%分位）</strong>反映机构加杠杆意愿不足，<strong>30Y-10Y利差51.3bp仍处88%分位</strong>，曲线陡峭的均值回归压力仍在。<br><br>
+    <strong>若DR007-OMO利差转正或10Y国债突破1.78%</strong>，风险链条可能加速主导。
+  </div>
+  <div class="chain-box grey-swan">
+    <span class="chain-label" style="color:var(--neutral)">灰天鹅提示（情景概率：10%）</span>
+    7月政治局会议定调、Q2经济数据超预期、海外美联储议息会议冲击——<strong style="color:#92702A">政策因子嵌入后此类风险的可预警性将提升。</strong>
+  </div>
+</div></section>
 
 <div class="section-rule"></div>
 
-<!-- ═══ 二、主链条判断 ═══ -->
-<section style="padding:32px 0;">
-  <div class="wrap">
-    <div class="sec-eyebrow">02 / 主链条判断</div>
-    <h2 class="sec-title">主链条与风险链条</h2>
-
-    <div class="chain-box main-chain">
-      <span class="chain-label" style="color:var(--accent)">主链条：利率区间震荡，小幅偏多（概率：60%）</span>
-      本周债市的核心支撑来自<strong>流动性因子（conf=+5，100%权重）</strong>——资金利率处于历史极低水位：IRS-FR007仅1.43%（1.0%分位）、SHIBOR 3M仅1.44%（4.4%分位），银行间流动性充裕构成利率上行的天然阻力。<br><br>
-      叠加<strong>基本面因子</strong>提供的弱利多信号（net=+0.32，70%权重）：沥青开工率-49.8%（2.7%分位）、乘用车零售-18%（14.6%分位）等高频指标持续指向经济活动偏弱，从基本面对长端利率形成下拉力量。<br><br>
-      <strong>机构行为虽net为负（-0.30）但边际已转正（+0.13）</strong>——基金二级净买入从-503亿改善至-74亿，票息图谱日度变动温和（30Y-10Y仅+0.52bp），表明上周的急剧走阔已趋于缓和。三个因子中两个偏多、一个偏空但边际改善，指向<strong>底部有支撑、空头动能减弱</strong>的震荡偏多格局。
-    </div>
-
-    <div class="chain-box risk-chain">
-      <span class="chain-label" style="color:var(--data)">风险链条：利差结构恶化+供给压力推动利率小幅上行（概率：30%）</span>
-      机构行为net仍为负值（-0.30），state层面利空信号未消除：<strong>30Y-10Y利差52.2bp处于91%分位</strong>（曲线极度陡峭），10Y-1Y存单利差28.4bp处于79%分位，票息图谱state=-0.40表明利差结构整体偏空。<br><br>
-      同时<strong>TKN占比仍处低位</strong>（7-10Y:39.5%处于14%分位，20-30Y:45.6%处于31%分位），<strong>杠杆率仅106.8%（8.5%分位）</strong>反映机构加杠杆意愿不足，<strong>政府债供给高峰</strong>（本周净融资6046亿）将在未来1-2周持续吸收市场流动性。<br><br>
-      <strong>若10Y国债突破1.78%或30Y-10Y利差突破55bp</strong>，则风险链条将加速主导。
-    </div>
-
-    <div class="chain-box grey-swan">
-      <span class="chain-label" style="color:var(--neutral)">灰天鹅提示（概率：10%）</span>
-      7月政治局会议定调超预期（如推出大规模财政刺激）、海外美联储意外加息、或信用风险事件引发流动性冲击——均为无法纳入常规模型的尾部风险，仅作提示。<strong style="color:#92702A">政策因子嵌入后此类风险的可预警性将提升。</strong>
+<section style="padding:32px 0;"><div class="wrap">
+  <div class="sec-eyebrow">03 / 反方审计</div>
+  <h2 class="sec-title">Verifier 审计</h2>
+  <div class="audit-item">
+    <div class="q">最大弱点</div>
+    <div class="a">
+      <strong>三因子全部中性（|net|均<0.4），无任何一个因子提供明确方向</strong>——这意味着主链条缺乏强有力的驱动因子，任何微小变化都可能打破平衡。<br><br>
+      机构行为的边际转正（+0.35）是最强正向信号，但其state仅+0.13（接近中性），且<strong>杠杆率仍在9.6%分位极低位</strong>，说明机构并未真正加杠杆追涨，改善的持续性存疑。<br><br>
+      流动性因子值得关注：逆回购余额一周内从6785亿降至620亿，若央行继续回笼，流动性因子可能转空。<br><br>
+      <strong style="color:#92702A">⚠ 政策因子缺失风险：</strong>Q2货币政策例会已发布，但系统尚未接入政策因子，无法评估政策语气变化对市场的影响。
     </div>
   </div>
-</section>
+  <div class="audit-item">
+    <div class="q">证伪条件（定量）</div>
+    <div class="a">
+      <strong>条件1：</strong>DR007-OMO利差转正且超过 <strong>+10bp</strong>（当前-1.75bp）→ 资金面确认收紧，流动性因子转空<br>
+      <strong>条件2：</strong>30城商品房同比<strong>连续2个月</strong>维持正值 → 房地产企稳确认，基本面利多逻辑大幅弱化<br>
+      <strong>条件3：</strong>基金二级净买入再次转负且持续3日 → 机构行为边际改善被证伪
+    </div>
+  </div>
+  <div class="audit-item">
+    <div class="q">赔率警示</div>
+    <div class="a">
+      <strong>拥挤反转仍触发两项：</strong><br>
+      ① 国开-国债10Y利差4.8bp（6.4%分位，触发crowding=low），隐含税率极度压缩<br>
+      ② 10Y-7D逆回购利差34.0bp（20%分位，触发crowding=low），已定价降息预期<br><br>
+      <strong>新增风险：</strong>逆回购余额620亿处于10%分位，央行继续回收空间有限——若反向投放，可能构成利多惊喜；若维持回笼，资金面承压。这是一个<strong>双向赔率不对称</strong>的位置。
+    </div>
+  </div>
+</div></section>
 
 <div class="section-rule"></div>
 
-<!-- ═══ 三、反方审计 ═══ -->
-<section style="padding:32px 0;">
-  <div class="wrap">
-    <div class="sec-eyebrow">03 / 反方审计</div>
-    <h2 class="sec-title">Verifier 审计</h2>
-
-    <div class="audit-item">
-      <div class="q">最大弱点</div>
-      <div class="a">
-        主链条过多依赖<strong>流动性因子</strong>（conf=+5），但流动性的利多来源是资金利率的「静态低位」而非「边际宽松」——DR001和R001的周度降幅仅4~5bp（marginal=+0.34），本质上是维持而非强化。<br><br>
-        <strong>机构行为state层面的利空信号未被边际改善完全对冲</strong>：虽然日度边际转正（+0.13），但30Y-10Y利差仍处91%分位、TKN占比仍处14%分位，state=-0.93表明结构性利空未消除。如果利差在高位继续走阔而非回落，边际改善将被证明是暂时的。<br><br>
-        <strong>基本面因子的内部一致性最差</strong>（仅14%），7个指标中state和marginal方向严重分歧，其+0.32的net信号可信度有限。<br><br>
-        <strong style="color:#92702A">⚠ 政策因子缺失风险：</strong>6/26回测中唯一误判正是因为缺乏政策面信号——市场在交易政治局会议预期，基本面利好被政策预期对冲。当前系统无法识别此类政策扰动。
-      </div>
-    </div>
-
-    <div class="audit-item">
-      <div class="q">证伪条件（定量）</div>
-      <div class="a">
-        <strong>条件1：</strong>DR001突破 <strong>1.45%</strong>（回升至逆回购利率上方）→ 流动性利多逻辑失效，主链条崩塌概率 >70%<br>
-        <strong>条件2：</strong>30Y-10Y利差突破 <strong>55bp</strong>（当前52.2bp，91%分位）且持续3个交易日 → 曲线陡峭化加速，票息图谱state进一步恶化<br>
-        <strong>条件3：</strong>10Y国债活跃券收益率跌破 <strong>1.70%</strong> → 多头逻辑被市场验证，但同时10Y-7D利差将压缩至30bp以下，触发更严重的拥挤反转
-      </div>
-    </div>
-
-    <div class="audit-item">
-      <div class="q">赔率警示</div>
-      <div class="a">
-        <strong>拥挤反转已触发两项：</strong><br>
-        ① 国开-国债10Y利差仅5.1bp（1年分位10%，触发crowding=low惩罚），隐含税率已严重压缩，<strong>继续做多利差压缩的赔率极低</strong><br>
-        ② 10Y国债-7D逆回购利差34.6bp（分位24%，触发crowding=low惩罚），已部分定价降息预期，<strong>若降息节奏不及预期则面临显著回撤</strong><br><br>
-        <strong>估值警示：</strong>10Y国债1.75%处于年内偏低水平（约20%分位），carry策略吸引力下降，久期策略盈亏比恶化。30Y-10Y利差52.2bp处于91%分位，曲线极度陡峭，均值回归压力大。
-      </div>
-    </div>
-  </div>
-</section>
+<section style="padding:32px 0;"><div class="wrap">
+  <div class="sec-eyebrow">04 / 三窗口策略</div>
+  <h2 class="sec-title">可执行策略建议</h2>
+  <div class="card"><div class="card-body" style="padding:16px 20px;">
+    <table>
+      <tr><th>窗口</th><th>策略方向</th><th>核心逻辑</th><th>关键观测点</th></tr>
+      <tr>
+        <td><strong style="color:var(--accent)">1周交易</strong></td>
+        <td><span class="tag tag-neu">中性</span></td>
+        <td style="font-size:12px">三因子全部中性偏多但信号弱，机构行为边际转正但流动性收紧对冲。建议观望或极轻仓试多</td>
+        <td style="font-size:12px">DR007-OMO利差是否转正<br>+ 逆回购操作方向</td>
+      </tr>
+      <tr>
+        <td><strong style="color:#92702A">2周观察</strong></td>
+        <td><span class="tag tag-bull">小幅偏多</span></td>
+        <td style="font-size:12px">机构行为边际改善趋势若延续（基金净买入持续为正），叠加基本面仍在低位，偏多概率上升</td>
+        <td style="font-size:12px">7月第二周高频数据<br>+ Q2经济数据发布</td>
+      </tr>
+      <tr>
+        <td><strong style="color:var(--data)">1月配置</strong></td>
+        <td><span class="tag tag-bull">偏多配置</span></td>
+        <td style="font-size:12px">基本面state=+1.28仍处利多区间（沥青/乘用车/农产品低位），经济弱复苏格局未变</td>
+        <td style="font-size:12px">7月PMI + Q2 GDP<br>→ 验证经济趋势</td>
+      </tr>
+    </table>
+  </div></div>
+</div></section>
 
 <div class="section-rule"></div>
 
-<!-- ═══ 四、三窗口策略 ═══ -->
-<section style="padding:32px 0;">
-  <div class="wrap">
-    <div class="sec-eyebrow">04 / 三窗口策略</div>
-    <h2 class="sec-title">可执行策略建议</h2>
+<section style="padding:32px 0;"><div class="wrap">
+  <div class="sec-eyebrow">05 / 待验证清单</div>
+  <h2 class="sec-title">本周待验证指标</h2>
+  <div class="card"><div class="card-body" style="padding:16px 20px;">
+    <table>
+      <tr><th>#</th><th>待验证指标</th><th>预期方向</th><th>验证逻辑</th></tr>
+      <tr><td>1</td><td><strong>DR007-OMO利差</strong></td><td>维持在负值(&lt;0)</td><td style="font-size:12px">当前-1.75bp，若转正→资金面确认收紧，流动性因子转空</td></tr>
+      <tr><td>2</td><td><strong>逆回购操作方向</strong></td><td>净投放或持平</td><td style="font-size:12px">当前余额仅620亿，若继续回笼→资金面承压；若转为投放→利多惊喜</td></tr>
+      <tr><td>3</td><td><strong>30城商品房成交同比</strong></td><td>是否维持正值</td><td style="font-size:12px">当前+3.4%为近期首次转正，若持续→房地产企稳确认，基本面利多弱化</td></tr>
+      <tr><td>4</td><td><strong>基金二级净买入</strong></td><td>维持在正值(>0)</td><td style="font-size:12px">当前+159亿，若再次转负→机构行为边际改善被证伪</td></tr>
+      <tr><td>5</td><td><strong>20-30Y TKN占比</strong></td><td>维持在55%以上</td><td style="font-size:12px">当前57.7%（76%分位），若回落至50%以下→做多动能减弱</td></tr>
+      <tr><td>6</td><td><strong>Q2经济数据</strong></td><td>GDP同比 ≤ 5.0%</td><td style="font-size:12px">若Q2 GDP超预期→基本面利多逻辑进一步弱化</td></tr>
+    </table>
+  </div></div>
+</div></section>
 
-    <div class="card">
-      <div class="card-body" style="padding:16px 20px;">
-        <table>
-          <tr><th>窗口</th><th>策略方向</th><th>仓位</th><th>核心逻辑</th><th>关键观测点</th></tr>
-          <tr>
-            <td><strong style="color:var(--accent)">1周交易</strong></td>
-            <td><span class="tag tag-bull">小幅偏多</span> + 对冲保护</td>
-            <td class="mono">80%</td>
-            <td style="font-size:12px">流动性支撑最强（conf=+5），机构行为边际转正（+0.13）降低空头风险，但基本面一致性差+机构state仍偏空→维持轻度对冲保护</td>
-            <td style="font-size:12px">DR001是否突破1.45%<br>→ 若突破则平多转中性</td>
-          </tr>
-          <tr>
-            <td><strong style="color:#92702A">2周观察</strong></td>
-            <td><span class="tag tag-neu">中性观望</span></td>
-            <td class="mono">50%</td>
-            <td style="font-size:12px">基本面边际正在恶化（煤炭反弹+港口走强），7月中旬高频数据将验证是否形成趋势。叠加7月政治局会议前的政策博弈期，方向不确定性上升</td>
-            <td style="font-size:12px">7月第二周煤炭/港口数据<br>+ 30Y国债发行结果</td>
-          </tr>
-          <tr>
-            <td><strong style="color:var(--data)">1月配置</strong></td>
-            <td><span class="tag tag-bull">偏多配置</span></td>
-            <td class="mono">100%</td>
-            <td style="font-size:12px">基本面state=+1.48（沥青/乘用车/农产品均处历史低位），经济基本面弱复苏格局未变。流动性conf=+5确认资金面不会主动收紧</td>
-            <td style="font-size:12px">7月PMI数据<br>→ 验证经济是否延续疲弱趋势</td>
-          </tr>
-        </table>
-        <div style="margin-top:12px;font-size:12px;color:var(--text-muted);">
-          <strong>仓位计算：</strong>平均有效置信度 2.13 → >+2 基准 = 正常仓位100%<br>
-          1周交易：机构行为边际转正→风险折扣减轻至80% | 2周观察：政策不确定性上升→50% | 1月配置：state信号稳定→100%
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="section-rule"></div>
-
-<!-- ═══ 五、待验证清单 ═══ -->
-<section style="padding:32px 0;">
-  <div class="wrap">
-    <div class="sec-eyebrow">05 / 待验证清单</div>
-    <h2 class="sec-title">本周待验证指标</h2>
-
-    <div class="card">
-      <div class="card-body" style="padding:16px 20px;">
-        <table>
-          <tr><th>#</th><th>待验证指标</th><th>预期方向</th><th>验证逻辑</th></tr>
-          <tr><td>1</td><td><strong>DR001 加权均价</strong></td><td>维持在 1.35%~1.40%</td><td style="font-size:12px">若升破1.45%，流动性利多逻辑失效；若维持1.36%附近，底部支撑确认</td></tr>
-          <tr><td>2</td><td><strong>30Y-10Y国债利差</strong></td><td>维持在 50~54bp</td><td style="font-size:12px">若突破55bp→票息图谱利空加速；若回落至50bp以下→利空压力缓解</td></tr>
-          <tr><td>3</td><td><strong>基金二级净买入（日频）</strong></td><td>从-74亿转为正值的持续性</td><td style="font-size:12px">若连续3日净买入>100亿→TKN占比可能触底反弹，机构行为信号转正</td></tr>
-          <tr><td>4</td><td><strong>7-10Y国债TKN占比</strong></td><td>是否在40%附近企稳</td><td style="font-size:12px">当前39.5%处于14%分位，若进一步跌破35%→做多情绪确认消退</td></tr>
-          <tr><td>5</td><td><strong>政府债缴款规模（下周）</strong></td><td>预计边际回落</td><td style="font-size:12px">本周6046亿为近1月峰值，若下周回落至3000亿以下→供给冲击减弱</td></tr>
-        </table>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ FOOTER ═══ -->
 <footer>
   <div class="wrap">
-    <span>债市五因子多Agent策略审计系统</span> &nbsp;|&nbsp; 三因子运行版 v1.0 &nbsp;|&nbsp; 2026-07-03<br>
+    <span>债市五因子多Agent策略审计系统</span> &nbsp;|&nbsp; 三因子运行版 v1.0 &nbsp;|&nbsp; 2026-07-10<br>
     <span style="color:var(--text-muted)">审计依据：基本面/流动性/机构行为三因子四维评分 | 政策因子待嵌入 | 市场定价因子待接入</span><br>
     <span style="color:var(--text-muted)">仅供参考，不构成投资建议</span>
   </div>
 </footer>
 
-</body>
-</html>
+</body></html>
